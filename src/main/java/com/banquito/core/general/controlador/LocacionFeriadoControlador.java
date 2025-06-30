@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/locaciones-feriados")
@@ -52,9 +51,10 @@ public class LocacionFeriadoControlador {
     @GetMapping("/locaciones/activas")
     @Operation(summary = "Listar locaciones geográficas activas")
     public ResponseEntity<List<LocacionGeograficaDTO>> listarLocacionesActivas() {
-        List<LocacionGeograficaDTO> dtos = service.listarLocacionesActivas().stream()
+        List<LocacionGeograficaDTO> dtos = service.listarLocacionesActivas()
+                .stream()
                 .map(locacionMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList(); // Usar toList() en lugar de collect(Collectors.toList()) - más eficiente
         return ResponseEntity.ok(dtos);
     }
 
@@ -103,18 +103,20 @@ public class LocacionFeriadoControlador {
     @GetMapping("/feriados")
     @Operation(summary = "Listar feriados activos de un año")
     public ResponseEntity<List<FeriadoDTO>> listarFeriadosPorAnio(@RequestParam int anio) {
-        List<FeriadoDTO> dtos = service.obtenerFeriadosPorAnio(anio).stream()
+        List<FeriadoDTO> dtos = service.obtenerFeriadosPorAnio(anio)
+                .stream()
                 .map(feriadoMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList(); // Usar toList() en lugar de collect(Collectors.toList()) - más eficiente
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/feriados/nacionales")
     @Operation(summary = "Listar feriados nacionales de un año")
     public ResponseEntity<List<FeriadoDTO>> listarFeriadosNacionalesPorAnio(@RequestParam int anio) {
-        List<FeriadoDTO> dtos = service.obtenerFeriadosNacionalesPorAnio(anio).stream()
+        List<FeriadoDTO> dtos = service.obtenerFeriadosNacionalesPorAnio(anio)
+                .stream()
                 .map(feriadoMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList(); // Usar toList() en lugar de collect(Collectors.toList()) - más eficiente
         return ResponseEntity.ok(dtos);
     }
 

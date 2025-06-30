@@ -10,16 +10,12 @@ import com.banquito.core.general.modelo.Feriado;
 import com.banquito.core.general.modelo.LocacionGeografica;
 import com.banquito.core.general.repositorio.FeriadosRepositorio;
 import com.banquito.core.general.repositorio.LocacionGeograficaRepositorio;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.banquito.core.general.dto.LocacionGeograficaDTO;
-import com.banquito.core.general.mapper.LocacionGeograficaMapper;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +23,9 @@ import java.util.stream.Collectors;
 public class LocacionFeriadoService {
     private final LocacionGeograficaRepositorio locacionGeograficaRepositorio;
     private final FeriadosRepositorio feriadosRepositorio;
-    private final LocacionGeograficaMapper locacionGeograficaMapper;
 
     // ================= LOCACION GEOGRAFICA =================
 
-    @Transactional
     public LocacionGeografica crearLocacionGeografica(LocacionGeografica locacion) {
         try {
             log.info("Creando nueva locación geográfica: {}", locacion.getProvincia());
@@ -46,7 +40,6 @@ public class LocacionFeriadoService {
         }
     }
 
-    @Transactional
     public LocacionGeografica modificarLocacionGeografica(String idLocacion, LocacionGeografica cambios) {
         log.info("Iniciando modificación de locación geográfica con ID: {}", idLocacion);
         LocacionGeografica entity = this.locacionGeograficaRepositorio.findById(idLocacion)
@@ -58,7 +51,6 @@ public class LocacionFeriadoService {
             if (cambios.getCanton() != null) entity.setCanton(cambios.getCanton());
             if (cambios.getCodigoParroquia() != null) entity.setCodigoParroquia(cambios.getCodigoParroquia());
             if (cambios.getParroquia() != null) entity.setParroquia(cambios.getParroquia());
-            // Incrementar versión
             entity.setVersion(entity.getVersion() == null ? 1L : entity.getVersion() + 1L);
             LocacionGeografica savedEntity = this.locacionGeograficaRepositorio.save(entity);
             log.info("Locación geográfica con ID {} modificada exitosamente.", savedEntity.getId());
@@ -71,21 +63,18 @@ public class LocacionFeriadoService {
 
     public List<LocacionGeografica> listarLocacionesActivas() {
         log.info("Listando todas las locaciones geográficas activas");
-        List<LocacionGeografica> locaciones = locacionGeograficaRepositorio.findAll()
-                .stream()
-                .filter(l -> EstadoLocacionesGeograficasEnum.ACTIVO.equals(l.getEstado()))
-                .collect(Collectors.toList());
+        List<LocacionGeografica> locaciones = locacionGeograficaRepositorio.findByEstado(EstadoLocacionesGeograficasEnum.ACTIVO);
         log.info("Se encontraron {} locaciones activas", locaciones.size());
         return locaciones;
     }
 
-    @Transactional
     public void cambiarEstadoLocacionGeografica(String idLocacion, EstadoLocacionesGeograficasEnum nuevoEstado) {
         log.info("Cambiando estado de locación geográfica con ID: {} a {}", idLocacion, nuevoEstado);
         LocacionGeografica entity = locacionGeograficaRepositorio.findById(idLocacion)
                 .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada", 2, "LocacionGeografica"));
         try {
             entity.setEstado(nuevoEstado);
+            entity.setVersion(entity.getVersion() == null ? 1L : entity.getVersion() + 1L);
             locacionGeograficaRepositorio.save(entity);
             log.info("Estado de locación geográfica con ID {} cambiado a {}.", idLocacion, nuevoEstado);
         } catch (Exception e) {
@@ -96,30 +85,40 @@ public class LocacionFeriadoService {
 
     public LocacionGeografica obtenerLocacionPorId(String idLocacion) {
         log.info("Buscando locación geográfica con ID: {}", idLocacion);
-        LocacionGeografica entity = locacionGeograficaRepositorio.findById(idLocacion)
+        return locacionGeograficaRepositorio.findById(idLocacion)
                 .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada", 2, "LocacionGeografica"));
-        return entity;
     }
 
     // ================= FERIADO =================
 
-    @Transactional
     public Feriado crearFeriado(Feriado feriado, String locacionId) {
         log.info("Iniciando creación de feriado '{}', tipo {}", feriado.getNombre(), feriado.getTipo());
+        
         if (TipoFeriadosEnum.LOCAL.equals(feriado.getTipo())) {
             if (locacionId == null || locacionId.isEmpty()) {
                 throw new CrearEntidadException("Feriado", "Para feriados locales debe especificar una locación.");
             }
-            log.debug("Feriado LOCAL, buscando locación con ID: {}", locacionId);
+            
+            // Obtener la locación y crear el DTO embebido directamente
             LocacionGeografica locacion = locacionGeograficaRepositorio.findById(locacionId)
                 .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la locación con ID: " + locacionId, null, "LocacionGeografica"));
-            LocacionGeograficaDTO locacionDTO = locacionGeograficaMapper.toDTO(locacion);
-            com.banquito.core.general.modelo.LocacionGeograficaDTO modeloLocacionDTO = toModeloLocacionGeograficaDTO(locacionDTO);
-            feriado.setLocacion(modeloLocacionDTO);
+            
+            // Crear el DTO embebido directamente desde la entidad
+            com.banquito.core.general.modelo.LocacionGeograficaDTO locacionEmbebida = new com.banquito.core.general.modelo.LocacionGeograficaDTO();
+            locacionEmbebida.setCodigoLocacion(locacion.getId());
+            locacionEmbebida.setCodigoProvincia(locacion.getCodigoProvincia());
+            locacionEmbebida.setProvincia(locacion.getProvincia());
+            locacionEmbebida.setCodigoCanton(locacion.getCodigoCanton());
+            locacionEmbebida.setCanton(locacion.getCanton());
+            locacionEmbebida.setCodigoParroquia(locacion.getCodigoParroquia());
+            locacionEmbebida.setParroquia(locacion.getParroquia());
+            
+            feriado.setLocacion(locacionEmbebida);
         } else {
             log.debug("Feriado NACIONAL, no se asigna locación específica.");
             feriado.setLocacion(null);
         }
+        
         feriado.setEstado(EstadoGeneralEnum.ACTIVO);
         feriado.setVersion(1L);
         Feriado feriadoGuardado = feriadosRepositorio.save(feriado);
@@ -127,21 +126,6 @@ public class LocacionFeriadoService {
         return feriadoGuardado;
     }
 
-    // Método auxiliar para convertir entre DTOs
-    private com.banquito.core.general.modelo.LocacionGeograficaDTO toModeloLocacionGeograficaDTO(LocacionGeograficaDTO dto) {
-        com.banquito.core.general.modelo.LocacionGeograficaDTO modelo = new com.banquito.core.general.modelo.LocacionGeograficaDTO();
-        modelo.setCodigoLocacion(dto.getCodigoLocacion());
-        modelo.setCodigoProvincia(dto.getCodigoProvincia());
-        modelo.setProvincia(dto.getProvincia());
-        modelo.setCodigoCanton(dto.getCodigoCanton());
-        modelo.setCanton(dto.getCanton());
-        modelo.setCodigoParroquia(dto.getCodigoParroquia());
-        modelo.setParroquia(dto.getParroquia());
-        // Agrega más campos si es necesario
-        return modelo;
-    }
-
-    @Transactional
     public Feriado modificarFeriado(Feriado feriado) {
         log.info("Iniciando modificación del feriado con ID: {}", feriado.getId());
         feriado.setVersion(feriado.getVersion() + 1L);
@@ -150,13 +134,8 @@ public class LocacionFeriadoService {
         return feriadoActualizado;
     }
 
-    @Transactional
     public Feriado cambiarEstadoFeriado(Feriado feriado) {
         log.info("Cambiando estado del feriado con ID: {} a {}", feriado.getId(), feriado.getEstado());
-        if (feriado.getEstado() == EstadoGeneralEnum.ACTIVO && feriado.getLocacion() != null) {
-            // Aquí puedes validar el estado si lo tienes en el DTO de modelo
-            // if (!"ACTIVO".equals(feriado.getLocacion().getEstado())) { ... }
-        }
         return this.modificarFeriado(feriado);
     }
 
