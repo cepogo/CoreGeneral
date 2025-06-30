@@ -2,14 +2,10 @@ package com.banquito.core.general.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class LocacionGeograficaDTO {
-    private String id;
-
+public class LocacionGeograficaCreacionDTO {
     @NotNull(message = "El código de locación no puede ser nulo")
     @Size(min = 1, max = 10, message = "El código de locación debe tener entre 1 y 10 caracteres")
     private String codigoLocacion;
