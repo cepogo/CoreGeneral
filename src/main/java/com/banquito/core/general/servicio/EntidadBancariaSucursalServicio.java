@@ -74,7 +74,7 @@ public class EntidadBancariaSucursalServicio {
         entidad.setVersion(entidad.getVersion() + 1);
 
         if (nuevoEstado == EstadoGeneralEnum.INACTIVO) {
-            List<Sucursal> sucursalesAsociadas = sucursalRepositorio.findByEntidadBancaria(entidad);
+            List<Sucursal> sucursalesAsociadas = sucursalRepositorio.findByEntidadBancariaId(entidad.getId());
             if (!sucursalesAsociadas.isEmpty()) {
                 for (Sucursal sucursal : sucursalesAsociadas) {
                     sucursal.setEstado(EstadoSucursalesEnum.INACTIVO);

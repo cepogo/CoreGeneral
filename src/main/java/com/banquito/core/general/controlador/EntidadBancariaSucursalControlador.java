@@ -43,6 +43,16 @@ public class EntidadBancariaSucursalControlador {
         return ResponseEntity.ok(entidadMapper.toDTO(servicio.crearEntidad(dto)));
     }
 
+    @GetMapping("/activa/primera")
+    @Operation(summary = "Obtener la primera entidad bancaria activa", description = "Busca y devuelve la primera entidad bancaria que encuentre con estado ACTIVO.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Entidad encontrada"),
+            @ApiResponse(responseCode = "404", description = "No se encontraron entidades activas")
+    })
+    public ResponseEntity<EntidadBancariaDTO> obtenerPrimeraEntidadBancariaActiva() {
+        return ResponseEntity.ok(servicio.obtenerPrimeraEntidadBancariaActiva());
+    }
+
     @PatchMapping("/{id}/estado")
     @Operation(summary = "Cambiar el estado de una Entidad Bancaria", description = "Cambia el estado de una entidad bancaria a ACTIVO o INACTIVO. Si se inactiva, todas sus sucursales también se inactivarán.")
     @ApiResponses({
