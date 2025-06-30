@@ -34,6 +34,13 @@ public class PaisMonedaControlador {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/paises/estado/{estado}")
+    @Operation(summary = "Listar países por estado")
+    public ResponseEntity<List<PaisDTO>> listarPaisesPorEstado(@PathVariable String estado) {
+        List<PaisDTO> dtos = service.listarPaisesPorEstado(estado);
+        return ResponseEntity.ok(dtos);
+    }
+
     @PutMapping("/paises/{id}")
     @Operation(summary = "Modificar país")
     public ResponseEntity<PaisDTO> actualizarPais(@PathVariable String id, @Valid @RequestBody PaisDTO dto) {
@@ -57,10 +64,10 @@ public class PaisMonedaControlador {
         return ResponseEntity.ok(creado);
     }
 
-    @GetMapping("/monedas")
-    @Operation(summary = "Listar monedas")
-    public ResponseEntity<List<MonedaDTO>> listarMonedas() {
-        List<MonedaDTO> dtos = service.listarMonedas();
+    @GetMapping("/monedas/estado/{estado}")
+    @Operation(summary = "Listar monedas por estado")
+    public ResponseEntity<List<MonedaDTO>> listarMonedasPorEstado(@PathVariable String estado) {
+        List<MonedaDTO> dtos = service.listarMonedasPorEstado(estado);
         return ResponseEntity.ok(dtos);
     }
 

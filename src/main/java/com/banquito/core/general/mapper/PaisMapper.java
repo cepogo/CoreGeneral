@@ -1,6 +1,7 @@
 package com.banquito.core.general.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import com.banquito.core.general.modelo.Pais;
@@ -12,4 +13,6 @@ public interface PaisMapper {
 
     PaisDTO toDTO(Pais pais);
     Pais toEntity(PaisDTO paisDTO);
+    
+    void updateFromDTO(PaisDTO paisDTO, @MappingTarget Pais pais);
 } 

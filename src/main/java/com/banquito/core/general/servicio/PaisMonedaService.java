@@ -11,7 +11,6 @@ import com.banquito.core.general.repositorio.PaisRepositorio;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,57 +39,85 @@ public class PaisMonedaService {
     }
 
     public List<PaisDTO> listarPaises() {
-        return paisRepositorio.findAll().stream().map(paisMapper::toDTO).collect(Collectors.toList());
+        return paisRepositorio.findAll().stream()
+                .map(paisMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<PaisDTO> listarPaisesPorEstado(String estado) {
+        return paisRepositorio.findByEstado(estado).stream()
+                .map(paisMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public PaisDTO actualizarPais(String id, PaisDTO paisDTO) {
-        Pais pais = paisRepositorio.findById(id).orElseThrow(() -> new RuntimeException("País no encontrado"));
-        Optional.ofNullable(paisDTO.getNombre()).ifPresent(pais::setNombre);
-        Optional.ofNullable(paisDTO.getCodigoTelefono()).ifPresent(pais::setCodigoTelefono);
+        Pais pais = paisRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("País no encontrado"));
+        
+        paisMapper.updateFromDTO(paisDTO, pais);
         pais.setVersion(pais.getVersion() != null ? pais.getVersion() + 1 : 1L);
+        
         return paisMapper.toDTO(paisRepositorio.save(pais));
     }
 
     @Transactional
-    public PaisDTO cambiarEstadoPais(String id, String nuevoEstado) {
-        Pais pais = paisRepositorio.findById(id).orElseThrow(() -> new RuntimeException("País no encontrado"));
+    public void cambiarEstadoPais(String id, String nuevoEstado) {
+        Pais pais = paisRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("País no encontrado"));
+        
         pais.setEstado(nuevoEstado);
         pais.setVersion(pais.getVersion() != null ? pais.getVersion() + 1 : 1L);
-        return paisMapper.toDTO(paisRepositorio.save(pais));
+        paisRepositorio.save(pais);
     }
 
     @Transactional
     public MonedaDTO crearMoneda(String idPais, MonedaDTO monedaDTO) {
-        Pais pais = paisRepositorio.findById(idPais).orElseThrow(() -> new RuntimeException("País no encontrado"));
+        Pais pais = paisRepositorio.findById(idPais)
+                .orElseThrow(() -> new RuntimeException("País no encontrado"));
+        
         if (monedaRepositorio.findByCodigo(monedaDTO.getCodigo()) != null) {
             throw new RuntimeException("Ya existe una moneda con el código: " + monedaDTO.getCodigo());
         }
+        
         Moneda moneda = monedaMapper.toEntity(monedaDTO);
         moneda.setPais(paisMapper.toDTO(pais));
         moneda.setEstado("ACTIVO");
         moneda.setVersion(1L);
+        
         return monedaMapper.toDTO(monedaRepositorio.save(moneda));
     }
 
     public List<MonedaDTO> listarMonedas() {
-        return monedaRepositorio.findAll().stream().map(monedaMapper::toDTO).collect(Collectors.toList());
+        return monedaRepositorio.findAll().stream()
+                .map(monedaMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MonedaDTO> listarMonedasPorEstado(String estado) {
+        return monedaRepositorio.findByEstado(estado).stream()
+                .map(monedaMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public MonedaDTO actualizarMoneda(String id, MonedaDTO monedaDTO) {
-        Moneda moneda = monedaRepositorio.findById(id).orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
-        Optional.ofNullable(monedaDTO.getNombre()).ifPresent(moneda::setNombre);
-        Optional.ofNullable(monedaDTO.getSimbolo()).ifPresent(moneda::setSimbolo);
+        Moneda moneda = monedaRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
+        
+        monedaMapper.updateFromDTO(monedaDTO, moneda);
         moneda.setVersion(moneda.getVersion() != null ? moneda.getVersion() + 1 : 1L);
+        
         return monedaMapper.toDTO(monedaRepositorio.save(moneda));
     }
 
     @Transactional
-    public MonedaDTO cambiarEstadoMoneda(String id, String nuevoEstado) {
-        Moneda moneda = monedaRepositorio.findById(id).orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
+    public void cambiarEstadoMoneda(String id, String nuevoEstado) {
+        Moneda moneda = monedaRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
+        
         moneda.setEstado(nuevoEstado);
         moneda.setVersion(moneda.getVersion() != null ? moneda.getVersion() + 1 : 1L);
-        return monedaMapper.toDTO(monedaRepositorio.save(moneda));
+        monedaRepositorio.save(moneda);
     }
 } 

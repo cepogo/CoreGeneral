@@ -65,14 +65,7 @@ public class LocacionFeriadoControlador {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/locaciones/{id}")
-    @Operation(summary = "Obtener locación geográfica por ID")
-    public ResponseEntity<LocacionGeograficaDTO> obtenerLocacionPorId(@PathVariable String id) {
-        LocacionGeografica entity = service.obtenerLocacionPorId(id);
-        return ResponseEntity.ok(locacionMapper.toDTO(entity));
-    }
-
-    // ================= FERIADOS =================
+   // ================= FERIADOS =================
 
     @PostMapping("/feriados")
     @Operation(summary = "Crear feriado")
@@ -120,10 +113,5 @@ public class LocacionFeriadoControlador {
         return ResponseEntity.ok(dtos);
     }
 
-    @GetMapping("/feriados/{id}")
-    @Operation(summary = "Obtener feriado por ID")
-    public ResponseEntity<FeriadoDTO> obtenerFeriadoPorId(@PathVariable String id) {
-        Feriado entity = service.obtenerFeriadoPorId(id);
-        return ResponseEntity.ok(feriadoMapper.toDTO(entity));
-    }
+
 } 

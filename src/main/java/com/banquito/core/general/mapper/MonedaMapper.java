@@ -1,6 +1,7 @@
 package com.banquito.core.general.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import com.banquito.core.general.modelo.Moneda;
@@ -12,4 +13,6 @@ public interface MonedaMapper {
 
     MonedaDTO toDTO(Moneda moneda);
     Moneda toEntity(MonedaDTO monedaDTO);
+    
+    void updateFromDTO(MonedaDTO monedaDTO, @MappingTarget Moneda moneda);
 } 
