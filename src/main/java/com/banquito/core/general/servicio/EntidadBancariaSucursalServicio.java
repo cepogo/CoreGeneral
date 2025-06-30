@@ -51,10 +51,10 @@ public class EntidadBancariaSucursalServicio {
         return entidadBancariaRepositorio.save(entidad);
     }
 
-    public EntidadBancariaDTO obtenerEntidadPorId(String id) {
-        log.info("Obteniendo entidad bancaria con ID: {}", id);
-        EntidadBancaria entidad = entidadBancariaRepositorio.findById(id)
-                .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la entidad bancaria con ID: " + id, 2, "EntidadBancaria"));
+    public EntidadBancariaDTO obtenerEntidadPorCodigoLocal(String codigoLocal) {
+        log.info("Obteniendo entidad bancaria con Codigo: {}", codigoLocal);
+        EntidadBancaria entidad = entidadBancariaRepositorio.findByCodigoLocal(codigoLocal)
+                .orElseThrow(() -> new EntidadNoEncontradaException("No EntidadBancaria found with codigoLocal: " + codigoLocal, 2, "EntidadBancaria"));
         return entidadBancariaMapper.toDTO(entidad);
     }
 
@@ -66,45 +66,42 @@ public class EntidadBancariaSucursalServicio {
     }
 
     @Transactional
-    public EntidadBancariaDTO cambiarEstadoEntidadBancaria(String id, EstadoGeneralEnum nuevoEstado) {
-        log.info("Cambiando estado de la entidad bancaria con ID: {} a {}", id, nuevoEstado);
-        EntidadBancaria entidad = entidadBancariaRepositorio.findById(id)
-                .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la entidad bancaria con ID: " + id, 2, "EntidadBancaria"));
+    public void cambiarEstadoEntidadBancaria(String codigoLocal, EstadoGeneralEnum nuevoEstado) {
+        log.info("Cambiando estado de la entidad bancaria con codigoLocal: {} a {}", codigoLocal, nuevoEstado);
+        EntidadBancaria entidad = entidadBancariaRepositorio.findByCodigoLocal(codigoLocal)
+                .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la entidad bancaria con codigoLocal: " + codigoLocal, 2, "EntidadBancaria"));
         entidad.setEstado(nuevoEstado);
         entidad.setVersion(entidad.getVersion() + 1);
 
         if (nuevoEstado == EstadoGeneralEnum.INACTIVO) {
             List<Sucursal> sucursalesAsociadas = sucursalRepositorio.findByEntidadBancariaId(entidad.getId());
-            if (!sucursalesAsociadas.isEmpty()) {
-                for (Sucursal sucursal : sucursalesAsociadas) {
-                    sucursal.setEstado(EstadoSucursalesEnum.INACTIVO);
-                    sucursal.setVersion(sucursal.getVersion() + 1);
-                    sucursalRepositorio.save(sucursal);
-                }
-                log.info("Todas las sucursales asociadas a la entidad bancaria con ID: {} han sido desactivadas", id);
+            for (Sucursal sucursal : sucursalesAsociadas) {
+                sucursal.setEstado(EstadoSucursalesEnum.INACTIVO);
+                sucursal.setVersion(sucursal.getVersion() + 1);
+                sucursalRepositorio.save(sucursal);
             }
         }
-        log.info("Estado de la entidad bancaria actualizado a {} para la entidad con ID: {}", nuevoEstado, id);
-        return entidadBancariaMapper.toDTO(entidadBancariaRepositorio.save(entidad));
+        entidadBancariaRepositorio.save(entidad);
     }
 
     // ================= SUCURSAL =================
 
-    public Sucursal obtenerSucursalPorId(String id) {
-        return sucursalRepositorio.findById(id)
-                .orElseThrow(() -> new EntidadNoEncontradaException("Sucursal no encontrada con ID: " + id, 2, "Sucursal"));
+    public Sucursal obtenerSucursalPorCodigo(String codigo) {
+        return sucursalRepositorio.findByCodigo(codigo)
+                .orElseThrow(() -> new EntidadNoEncontradaException("Sucursal no encontrada con código: " + codigo, 2, "Sucursal"));
     }
 
     @Transactional
-    public Sucursal crearSucursal(String entidadId, SucursalCreacionDTO dto) {
+    public Sucursal crearSucursal(String entidadCodigoLocal, SucursalCreacionDTO dto) {
         log.info("Iniciando creación de sucursal con código: {}", dto.getCodigo());
         try {
-            obtenerEntidadPorId(entidadId);
+            EntidadBancaria entidad = entidadBancariaRepositorio.findByCodigoLocal(entidadCodigoLocal)
+                    .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la entidad bancaria con entidadCodigoLocal: " + entidadCodigoLocal, 2, "EntidadBancaria"));
             locacionGeograficaRepositorio.findById(dto.getLocacionId())
                     .orElseThrow(() -> new EntidadNoEncontradaException("Locación no encontrada con ID: " + dto.getLocacionId(), 1, "Locacion"));
 
             Sucursal sucursal = sucursalMapper.toEntity(dto);
-            sucursal.setEntidadBancariaId(entidadId);
+            sucursal.setEntidadBancariaId(entidad.getId());
             sucursal.setFechaCreacion(LocalDate.now());
             sucursal.setEstado(EstadoSucursalesEnum.ACTIVO);
             sucursal.setVersion(1L);
@@ -118,9 +115,9 @@ public class EntidadBancariaSucursalServicio {
     }
 
     @Transactional
-    public Sucursal modificarSucursal(String id, SucursalUpdateDTO dto) {
-        log.info("Iniciando modificación de sucursal con ID: {}", id);
-        Sucursal sucursal = obtenerSucursalPorId(id);
+    public Sucursal modificarSucursal(String codigo, SucursalUpdateDTO dto) {
+        log.info("Iniciando modificación de sucursal con codigo: {}", codigo);
+        Sucursal sucursal = obtenerSucursalPorCodigo(codigo);
         try {
             sucursalMapper.updateFromDTO(dto, sucursal);
             sucursal.setVersion(sucursal.getVersion() + 1);
@@ -128,18 +125,19 @@ public class EntidadBancariaSucursalServicio {
             log.info("Sucursal con ID {} modificada exitosamente.", savedEntity.getId());
             return savedEntity;
         } catch (Exception e) {
-            log.error("Error al modificar sucursal con ID {}: {}", id, e.getMessage(), e);
+            log.error("Error al modificar sucursal con codigo {}: {}", codigo, e.getMessage(), e);
             throw new ActualizarEntidadException("Sucursal", "Error al modificar la sucursal: " + e.getMessage());
         }
     }
 
     @Transactional
-    public void cambiarEstadoSucursal(String id, EstadoSucursalesEnum nuevoEstado) {
-        log.info("Cambiando estado de sucursal {} a {}", id, nuevoEstado.name());
-        Sucursal sucursal = obtenerSucursalPorId(id);
+    public void cambiarEstadoSucursal(String codigo, EstadoSucursalesEnum nuevoEstado) {
+        log.info("Cambiando estado de sucursal {} a {}", codigo, nuevoEstado.name());
+        Sucursal sucursal = obtenerSucursalPorCodigo(codigo);
         try {
             if (nuevoEstado == EstadoSucursalesEnum.ACTIVO) {
-                EntidadBancariaDTO entidad = obtenerEntidadPorId(sucursal.getEntidadBancariaId());
+                EntidadBancaria entidad = entidadBancariaRepositorio.findById(sucursal.getEntidadBancariaId())
+                        .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la entidad bancaria con ID: " + sucursal.getEntidadBancariaId(), 2, "EntidadBancaria"));
                 if (entidad.getEstado() != EstadoGeneralEnum.ACTIVO) {
                     throw new ActualizarEntidadException("Sucursal", "No se puede activar la sucursal porque la entidad bancaria está inactiva.");
                 }
@@ -152,9 +150,9 @@ public class EntidadBancariaSucursalServicio {
             sucursal.setEstado(nuevoEstado);
             sucursal.setVersion(sucursal.getVersion() + 1);
             sucursalRepositorio.save(sucursal);
-            log.info("Estado de sucursal {} cambiado a {}.", id, nuevoEstado.name());
+            log.info("Estado de sucursal {} cambiado a {}.", codigo, nuevoEstado.name());
         } catch (RuntimeException e) {
-            log.error("Error al cambiar estado de sucursal {}: {}", id, e.getMessage(), e);
+            log.error("Error al cambiar estado de sucursal {}: {}", codigo, e.getMessage(), e);
             throw new ActualizarEntidadException("Sucursal", "Error al cambiar el estado de la sucursal: " + e.getMessage());
         }
     }

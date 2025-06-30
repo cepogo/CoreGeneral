@@ -53,48 +53,69 @@ public class EntidadBancariaSucursalControlador {
         return ResponseEntity.ok(servicio.obtenerPrimeraEntidadBancariaActiva());
     }
 
-    @PatchMapping("/{id}/estado")
+    @PatchMapping("/{codigoLocal}/estado")
     @Operation(summary = "Cambiar el estado de una Entidad Bancaria", description = "Cambia el estado de una entidad bancaria a ACTIVO o INACTIVO. Si se inactiva, todas sus sucursales también se inactivarán.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Estado cambiado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Entidad no encontrada")
     })
-    public ResponseEntity<Void> cambiarEstadoEntidad(@PathVariable String id, @RequestParam EstadoGeneralEnum estado) {
-        servicio.cambiarEstadoEntidadBancaria(id, estado);
+    public ResponseEntity<Void> cambiarEstadoEntidad(@PathVariable String codigoLocal, @RequestParam EstadoGeneralEnum estado) {
+        servicio.cambiarEstadoEntidadBancaria(codigoLocal, estado);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{entidadId}/sucursales")
+
+    @GetMapping("/{codigoLocal}")
+    @Operation(summary = "Obtener entidad bancaria por codigoLocal", description = "Busca y devuelve una entidad bancaria por su clave primaria.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Entidad encontrada"),
+            @ApiResponse(responseCode = "404", description = "Entidad no encontrada")
+    })
+    public ResponseEntity<EntidadBancariaDTO> obtenerEntidad(@PathVariable String codigoLocal) {
+        return ResponseEntity.ok(servicio.obtenerEntidadPorCodigoLocal(codigoLocal));
+    }
+
+    @PostMapping("/{entidadCodigoLocal}/sucursales")
     @Operation(summary = "Crear una nueva Sucursal para una Entidad", description = "Crea una nueva sucursal y la asocia a una entidad bancaria existente.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sucursal creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
             @ApiResponse(responseCode = "404", description = "Entidad Bancaria o Locación no encontrada")
     })
-    public ResponseEntity<SucursalDTO> crearSucursal(@PathVariable String entidadId, @Valid @RequestBody SucursalCreacionDTO dto) {
-        return ResponseEntity.ok(sucursalMapper.toDTO(servicio.crearSucursal(entidadId, dto)));
+    public ResponseEntity<SucursalDTO> crearSucursal(@PathVariable String entidadCodigoLocal, @Valid @RequestBody SucursalCreacionDTO dto) {
+        return ResponseEntity.ok(sucursalMapper.toDTO(servicio.crearSucursal(entidadCodigoLocal, dto)));
     }
 
-    @PutMapping("/sucursales/{id}")
+    @GetMapping("/sucursales/{codigo}")
+    @Operation(summary = "Obtener sucursal por codigo", description = "Busca y devuelve la sucursal por su codigo.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sucursal encontrada"),
+            @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
+    })
+    public ResponseEntity<Sucursal> obtenerSucursalPorCodigo(@PathVariable String codigo) {
+        return ResponseEntity.ok(servicio.obtenerSucursalPorCodigo(codigo));
+    }
+
+    @PutMapping("/sucursales/{codigo}")
     @Operation(summary = "Modificar datos de una Sucursal", description = "Modifica los datos permitidos de una sucursal existente.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sucursal modificada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
             @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
     })
-    public ResponseEntity<SucursalDTO> modificarSucursal(@PathVariable String id, @Valid @RequestBody SucursalUpdateDTO dto) {
-        return ResponseEntity.ok(sucursalMapper.toDTO(servicio.modificarSucursal(id, dto)));
+    public ResponseEntity<SucursalDTO> modificarSucursal(@PathVariable String codigo, @Valid @RequestBody SucursalUpdateDTO dto) {
+        return ResponseEntity.ok(sucursalMapper.toDTO(servicio.modificarSucursal(codigo, dto)));
     }
 
-    @PatchMapping("/sucursales/{id}/estado")
+    @PatchMapping("/sucursales/{codigo}/estado")
     @Operation(summary = "Cambiar el estado de una Sucursal", description = "Cambia el estado de una sucursal a ACTIVO o INACTIVO.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Estado cambiado exitosamente"),
             @ApiResponse(responseCode = "400", description = "No se puede activar la sucursal si su entidad o locación están inactivas"),
             @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
     })
-    public ResponseEntity<Void> cambiarEstadoSucursal(@PathVariable String id, @RequestParam EstadoSucursalesEnum estado) {
-        servicio.cambiarEstadoSucursal(id, estado);
+    public ResponseEntity<Void> cambiarEstadoSucursal(@PathVariable String codigo, @RequestParam EstadoSucursalesEnum estado) {
+        servicio.cambiarEstadoSucursal(codigo, estado);
         return ResponseEntity.noContent().build();
     }
 
