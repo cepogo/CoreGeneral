@@ -10,5 +10,7 @@ import java.util.Optional;
 @Repository
 public interface EntidadBancariaRepositorio extends MongoRepository<EntidadBancaria, String> {
     Optional<EntidadBancaria> findFirstByEstado(EstadoGeneralEnum estado);
+    Optional<EntidadBancaria> findByCodigoLocal(String codigoLocal);
+
 
 }
