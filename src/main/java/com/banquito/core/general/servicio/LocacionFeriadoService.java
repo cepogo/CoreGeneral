@@ -47,7 +47,6 @@ public class LocacionFeriadoService {
         LocacionGeografica entity = this.locacionGeograficaRepositorio.findById(idLocacion)
                 .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada", 2, "LocacionGeografica"));
         try {
-            // Usar mapper para actualizar solo los campos no nulos
             locacionMapper.updateFromEntity(cambios, entity);
             entity.setVersion(entity.getVersion() == null ? 1L : entity.getVersion() + 1L);
             LocacionGeografica savedEntity = this.locacionGeograficaRepositorio.save(entity);
@@ -97,11 +96,9 @@ public class LocacionFeriadoService {
                 throw new CrearEntidadException("Feriado", "Para feriados locales debe especificar una locación.");
             }
             
-            // Obtener la locación y crear el DTO embebido usando mapper
             LocacionGeografica locacion = locacionGeograficaRepositorio.findById(locacionId)
                 .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la locación con ID: " + locacionId, null, "LocacionGeografica"));
             
-            // Usar mapper para crear el DTO embebido
             com.banquito.core.general.modelo.LocacionGeograficaDTO locacionEmbebida = locacionMapper.toEmbeddedDTO(locacion);
             feriado.setLocacion(locacionEmbebida);
         } else {

@@ -99,7 +99,7 @@ public class LocacionFeriadoControlador {
         List<FeriadoDTO> dtos = service.obtenerFeriadosPorAnio(anio)
                 .stream()
                 .map(feriadoMapper::toDTO)
-                .toList(); // Usar toList() en lugar de collect(Collectors.toList()) - más eficiente
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -109,7 +109,7 @@ public class LocacionFeriadoControlador {
         List<FeriadoDTO> dtos = service.obtenerFeriadosNacionalesPorAnio(anio)
                 .stream()
                 .map(feriadoMapper::toDTO)
-                .toList(); // Usar toList() en lugar de collect(Collectors.toList()) - más eficiente
+                .toList(); 
         return ResponseEntity.ok(dtos);
     }
 
