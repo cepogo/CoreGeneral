@@ -3,7 +3,6 @@ package com.banquito.core.general.modelo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.banquito.core.general.enums.EstadoLocacionesGeograficasEnum;
 
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -38,7 +37,7 @@ public class LocacionGeografica {
     private String canton;
     private String codigoParroquia;
     private String parroquia;
-    private EstadoLocacionesGeograficasEnum estado;
+    private String estado;
     private Long version;
 
     public LocacionGeografica(String id) {

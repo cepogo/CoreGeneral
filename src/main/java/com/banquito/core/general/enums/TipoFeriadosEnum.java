@@ -1,17 +1,9 @@
 package com.banquito.core.general.enums;
 
-public enum TipoFeriadosEnum {
+public class TipoFeriadosEnum {
 
-    NACIONAL("NACIONAL"),
-    LOCAL("LOCAL");
-
-    private final String valor;
-
-    TipoFeriadosEnum(String valor) {
-        this.valor = valor;
+    private TipoFeriadosEnum() {
     }
-
-    public String getValor() {
-        return valor;
-    }
+    public static final String NACIONAL = "NACIONAL";
+    public static final String LOCAL = "LOCAL";
 }

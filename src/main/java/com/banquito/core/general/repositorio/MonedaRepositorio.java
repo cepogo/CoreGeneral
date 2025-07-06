@@ -5,6 +5,6 @@ import com.banquito.core.general.modelo.Moneda;
 import java.util.List;
  
 public interface MonedaRepositorio extends MongoRepository<Moneda, String> {
-    Moneda findByCodigo(String codigo);
+    Moneda findByCodigoMoneda(String codigoMoneda);
     List<Moneda> findByEstado(String estado);
-} 
+}

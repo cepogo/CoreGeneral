@@ -1,17 +1,10 @@
 package com.banquito.core.general.enums;
 
-public enum EstadoGeneralEnum {
+public class EstadoGeneralEnum {
 
-    ACTIVO("ACTIVO"),
-    INACTIVO("INACTIVO");
-
-    private final String valor;
-
-    EstadoGeneralEnum(String valor) {
-        this.valor = valor;
+    EstadoGeneralEnum() {
     }
 
-    public String getValor() {
-        return valor;
-    }
+    public static final String ACTIVO = "ACTIVO";
+    public static final String INACTIVO = "INACTIVO";
 }

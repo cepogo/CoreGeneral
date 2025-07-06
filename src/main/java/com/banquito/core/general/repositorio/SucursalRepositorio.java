@@ -1,6 +1,5 @@
 package com.banquito.core.general.repositorio;
 
-import com.banquito.core.general.enums.EstadoSucursalesEnum;
 import com.banquito.core.general.modelo.Sucursal;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -10,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface SucursalRepositorio extends MongoRepository<Sucursal, String> {
-    List<Sucursal> findByEntidadBancariaId(String entidadBancariaId);
-    List<Sucursal> findByLocacionIdAndEstado(String locacionId, EstadoSucursalesEnum estado);
-    Optional<Sucursal> findByCodigo(String codigo);
+    List<Sucursal> findByCodigoEntidadBancaria(String codigoEntidadBancaria);
+    List<Sucursal> findByLocacionGeografica_CodigoLocacionAndEstado(String codigoLocacion, String estado);
+    Optional<Sucursal> findByCodigoSucursal(String codigoSucursal);
 }

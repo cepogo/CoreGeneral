@@ -29,10 +29,18 @@ public class PaisMonedaService {
 
     @Transactional
     public PaisDTO crearPais(PaisDTO paisDTO) {
-        if (paisRepositorio.findByCodigo(paisDTO.getCodigo()) != null) {
-            throw new RuntimeException("Ya existe un país con el código: " + paisDTO.getCodigo());
+        if (paisRepositorio.findByCodigoPais(paisDTO.getCodigoPais()) != null) {
+            throw new RuntimeException("Ya existe un país con el código: " + paisDTO.getCodigoPais());
         }
         Pais pais = paisMapper.toEntity(paisDTO);
+        if (paisDTO.getCodigoMoneda() != null) {
+            Moneda moneda = monedaRepositorio.findByCodigoMoneda(paisDTO.getCodigoMoneda());
+            if (moneda == null) {
+                throw new RuntimeException("Moneda no encontrada con código: " + paisDTO.getCodigoMoneda());
+            }
+            pais.setMoneda(monedaMapper.toDTO(moneda));
+        }
+
         pais.setEstado("ACTIVO");
         pais.setVersion(1L);
         return paisMapper.toDTO(paisRepositorio.save(pais));
@@ -51,37 +59,46 @@ public class PaisMonedaService {
     }
 
     @Transactional
-    public PaisDTO actualizarPais(String id, PaisDTO paisDTO) {
-        Pais pais = paisRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("País no encontrado"));
+    public PaisDTO actualizarPais(String codigoPais, PaisDTO paisDTO) {
+        Pais pais = paisRepositorio.findByCodigoPais(codigoPais);
+        if (pais == null) {
+            throw new RuntimeException("País no encontrado con código: " + codigoPais);
+        }
         
         paisMapper.updateFromDTO(paisDTO, pais);
+
+        if (paisDTO.getCodigoMoneda() != null) {
+            Moneda moneda = monedaRepositorio.findByCodigoMoneda(paisDTO.getCodigoMoneda());
+            if (moneda == null) {
+                throw new RuntimeException("Moneda no encontrada con código: " + paisDTO.getCodigoMoneda());
+            }
+            pais.setMoneda(monedaMapper.toDTO(moneda));
+        }
+
         pais.setVersion(pais.getVersion() != null ? pais.getVersion() + 1 : 1L);
         
         return paisMapper.toDTO(paisRepositorio.save(pais));
     }
 
     @Transactional
-    public void cambiarEstadoPais(String id, String nuevoEstado) {
-        Pais pais = paisRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("País no encontrado"));
-        
+    public void cambiarEstadoPais(String codigoPais, String nuevoEstado) {
+        Pais pais = paisRepositorio.findByCodigoPais(codigoPais);
+        if (pais == null) {
+            throw new RuntimeException("País no encontrado con código: " + codigoPais);
+        }
         pais.setEstado(nuevoEstado);
         pais.setVersion(pais.getVersion() != null ? pais.getVersion() + 1 : 1L);
         paisRepositorio.save(pais);
     }
 
     @Transactional
-    public MonedaDTO crearMoneda(String idPais, MonedaDTO monedaDTO) {
-        Pais pais = paisRepositorio.findById(idPais)
-                .orElseThrow(() -> new RuntimeException("País no encontrado"));
-        
-        if (monedaRepositorio.findByCodigo(monedaDTO.getCodigo()) != null) {
-            throw new RuntimeException("Ya existe una moneda con el código: " + monedaDTO.getCodigo());
+    public MonedaDTO crearMoneda(MonedaDTO monedaDTO) {
+
+        if (monedaRepositorio.findByCodigoMoneda(monedaDTO.getCodigoMoneda()) != null) {
+            throw new RuntimeException("Ya existe una moneda con el código: " + monedaDTO.getCodigoMoneda());
         }
         
         Moneda moneda = monedaMapper.toEntity(monedaDTO);
-        moneda.setPais(paisMapper.toDTO(pais));
         moneda.setEstado("ACTIVO");
         moneda.setVersion(1L);
         
@@ -101,9 +118,11 @@ public class PaisMonedaService {
     }
 
     @Transactional
-    public MonedaDTO actualizarMoneda(String id, MonedaDTO monedaDTO) {
-        Moneda moneda = monedaRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
+    public MonedaDTO actualizarMoneda(String codigoMoneda, MonedaDTO monedaDTO) {
+        Moneda moneda = monedaRepositorio.findByCodigoMoneda(codigoMoneda);
+        if (moneda == null) {
+            throw new RuntimeException("Moneda no encontrada con código: " + codigoMoneda);
+        }
         
         monedaMapper.updateFromDTO(monedaDTO, moneda);
         moneda.setVersion(moneda.getVersion() != null ? moneda.getVersion() + 1 : 1L);
@@ -112,10 +131,13 @@ public class PaisMonedaService {
     }
 
     @Transactional
-    public void cambiarEstadoMoneda(String id, String nuevoEstado) {
-        Moneda moneda = monedaRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
-        
+    public void cambiarEstadoMoneda(String codigoMoneda, String nuevoEstado) {
+        Moneda moneda = monedaRepositorio.findByCodigoMoneda(codigoMoneda);
+        if (moneda == null) {
+            throw new RuntimeException("Moneda no encontrada con código: " + codigoMoneda);
+        }
+
+
         moneda.setEstado(nuevoEstado);
         moneda.setVersion(moneda.getVersion() != null ? moneda.getVersion() + 1 : 1L);
         monedaRepositorio.save(moneda);

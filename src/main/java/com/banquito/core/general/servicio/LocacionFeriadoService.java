@@ -1,5 +1,6 @@
 package com.banquito.core.general.servicio;
 
+import com.banquito.core.general.dto.LocacionGeograficaDTO;
 import com.banquito.core.general.enums.EstadoGeneralEnum;
 import com.banquito.core.general.enums.EstadoLocacionesGeograficasEnum;
 import com.banquito.core.general.enums.TipoFeriadosEnum;
@@ -65,7 +66,7 @@ public class LocacionFeriadoService {
         return locaciones;
     }
 
-    public void cambiarEstadoLocacionGeografica(String idLocacion, EstadoLocacionesGeograficasEnum nuevoEstado) {
+    public void cambiarEstadoLocacionGeografica(String idLocacion, String nuevoEstado) {
         log.info("Cambiando estado de locación geográfica con ID: {} a {}", idLocacion, nuevoEstado);
         LocacionGeografica entity = locacionGeograficaRepositorio.findById(idLocacion)
                 .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada", 2, "LocacionGeografica"));
@@ -99,7 +100,7 @@ public class LocacionFeriadoService {
             LocacionGeografica locacion = locacionGeograficaRepositorio.findById(locacionId)
                 .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la locación con ID: " + locacionId, null, "LocacionGeografica"));
             
-            com.banquito.core.general.modelo.LocacionGeograficaDTO locacionEmbebida = locacionMapper.toEmbeddedDTO(locacion);
+            LocacionGeograficaDTO locacionEmbebida = locacionMapper.toEmbeddedDTO(locacion);
             feriado.setLocacion(locacionEmbebida);
         } else {
             log.debug("Feriado NACIONAL, no se asigna locación específica.");

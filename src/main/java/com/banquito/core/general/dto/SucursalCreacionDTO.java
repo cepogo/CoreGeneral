@@ -2,19 +2,21 @@ package com.banquito.core.general.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
+@Builder
 public class SucursalCreacionDTO {
 
-    @NotNull(message = "El ID de la locación no puede ser nulo")
-    private String locacionId;
+    @NotNull(message = "El codigo de la locación no puede ser nulo")
+    private String codigoLocacion;
 
     @NotNull(message = "El código no puede ser nulo")
     @Size(max = 10, message = "El código debe tener máximo 10 caracteres")
-    private String codigo;
+    private String codigoSucursal;
 
     @NotNull(message = "El nombre no puede ser nulo")
     @Size(max = 30, message = "El nombre debe tener máximo 30 caracteres")

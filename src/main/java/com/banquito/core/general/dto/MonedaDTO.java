@@ -1,12 +1,12 @@
 package com.banquito.core.general.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class MonedaDTO {
-    private String id;
-    private String codigo;
+    private String codigoMoneda;
     private String nombre;
     private String simbolo;
-    private PaisDTO pais;
 } 

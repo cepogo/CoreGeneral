@@ -1,7 +1,5 @@
 package com.banquito.core.general.dto;
 
-import com.banquito.core.general.enums.EstadoGeneralEnum;
-import com.banquito.core.general.enums.TipoFeriadosEnum;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,7 +10,6 @@ import lombok.Data;
 @Data
 @Builder
 public class FeriadoDTO {
-    private String id;
 
     @NotNull(message = "La fecha no puede ser nula")
     @FutureOrPresent(message = "La fecha debe ser actual o futura")
@@ -23,10 +20,10 @@ public class FeriadoDTO {
     private String nombre;
 
     @NotNull(message = "El tipo no puede ser nulo")
-    private TipoFeriadosEnum tipo;
+    private String tipo;
 
     @NotNull(message = "El estado no puede ser nulo")
-    private EstadoGeneralEnum estado;
+    private String estado;
 
     private LocacionGeograficaDTO locacion;
 

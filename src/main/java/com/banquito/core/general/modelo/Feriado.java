@@ -1,11 +1,11 @@
 package com.banquito.core.general.modelo;
 
 import java.time.LocalDate;
+
+import com.banquito.core.general.dto.LocacionGeograficaDTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.banquito.core.general.enums.EstadoGeneralEnum;
-import com.banquito.core.general.enums.TipoFeriadosEnum;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,8 +25,8 @@ public class Feriado {
     private String id;
     private LocalDate fecha;
     private String nombre;
-    private TipoFeriadosEnum tipo;
-    private EstadoGeneralEnum estado;
+    private String tipo;
+    private String estado;
     private LocacionGeograficaDTO locacion;
     private Long version;
 

@@ -1,6 +1,5 @@
 package com.banquito.core.general.dto;
 
-import com.banquito.core.general.enums.TipoFeriadosEnum;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -21,7 +20,7 @@ public class FeriadoCreacionDTO {
     private String nombre;
 
     @NotNull(message = "El tipo no puede ser nulo")
-    private TipoFeriadosEnum tipo;
+    private String tipo;
 
     // Para feriados LOCALES, este campo debe contener el ID de la locación.
     // Para feriados NACIONALES, puede ser nulo.

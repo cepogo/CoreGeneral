@@ -1,6 +1,5 @@
 package com.banquito.core.general.dto;
 
-import com.banquito.core.general.enums.EstadoSucursalesEnum;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,10 +9,10 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class SucursalDTO {
-    private String id;
-    private String entidadBancariaId;
-    private String locacionId;
-    private String codigo;
+
+    private String codigoSucursal;
+    private String codigoEntidadBancaria;
+    private LocacionGeograficaDTO locacionGeografica;
     private String nombre;
     private LocalDate fechaCreacion;
     private String correoElectronico;
@@ -22,5 +21,5 @@ public class SucursalDTO {
     private String direccionLinea2;
     private BigDecimal latitud;
     private BigDecimal longitud;
-    private EstadoSucursalesEnum estado;
+    private String estado;
 }

@@ -3,7 +3,6 @@ package com.banquito.core.general.modelo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.banquito.core.general.dto.PaisDTO;
 
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -26,12 +25,9 @@ public class Moneda {
     private String id;
 
     @Indexed(unique = true)
-    private String codigo;
+    private String codigoMoneda;
     private String nombre;
     private String simbolo;
-
-    @Indexed
-    private PaisDTO pais;
 
     private String estado;
     private Long version;

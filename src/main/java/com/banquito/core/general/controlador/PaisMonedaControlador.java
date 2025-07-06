@@ -41,26 +41,26 @@ public class PaisMonedaControlador {
         return ResponseEntity.ok(dtos);
     }
 
-    @PutMapping("/paises/{id}")
+    @PutMapping("/paises/{codigoPais}")
     @Operation(summary = "Modificar país")
-    public ResponseEntity<PaisDTO> actualizarPais(@PathVariable String id, @Valid @RequestBody PaisDTO dto) {
-        PaisDTO actualizado = service.actualizarPais(id, dto);
+    public ResponseEntity<PaisDTO> actualizarPais(@PathVariable String codigoPais, @Valid @RequestBody PaisDTO dto) {
+        PaisDTO actualizado = service.actualizarPais(codigoPais, dto);
         return ResponseEntity.ok(actualizado);
     }
 
-    @PatchMapping("/paises/{id}/estado")
+    @PatchMapping("/paises/{codigoPais}/estado")
     @Operation(summary = "Cambiar estado de país")
-    public ResponseEntity<Void> cambiarEstadoPais(@PathVariable String id, @RequestParam String estado) {
-        service.cambiarEstadoPais(id, estado);
+    public ResponseEntity<Void> cambiarEstadoPais(@PathVariable String codigoPais, @RequestParam String estado) {
+        service.cambiarEstadoPais(codigoPais, estado);
         return ResponseEntity.ok().build();
     }
 
     // ================= MONEDAS =================
 
-    @PostMapping("/paises/{idPais}/monedas")
-    @Operation(summary = "Crear moneda para un país")
-    public ResponseEntity<MonedaDTO> crearMoneda(@PathVariable String idPais, @Valid @RequestBody MonedaDTO dto) {
-        MonedaDTO creado = service.crearMoneda(idPais, dto);
+    @PostMapping("/monedas")
+    @Operation(summary = "Crear moneda")
+    public ResponseEntity<MonedaDTO> crearMoneda(@Valid @RequestBody MonedaDTO dto) {
+        MonedaDTO creado = service.crearMoneda(dto);
         return ResponseEntity.ok(creado);
     }
 
@@ -71,17 +71,17 @@ public class PaisMonedaControlador {
         return ResponseEntity.ok(dtos);
     }
 
-    @PutMapping("/monedas/{id}")
+    @PutMapping("/monedas/{codigoMoneda}")
     @Operation(summary = "Modificar moneda")
-    public ResponseEntity<MonedaDTO> actualizarMoneda(@PathVariable String id, @Valid @RequestBody MonedaDTO dto) {
-        MonedaDTO actualizado = service.actualizarMoneda(id, dto);
+    public ResponseEntity<MonedaDTO> actualizarMoneda(@PathVariable String codigoMoneda, @Valid @RequestBody MonedaDTO dto) {
+        MonedaDTO actualizado = service.actualizarMoneda(codigoMoneda, dto);
         return ResponseEntity.ok(actualizado);
     }
 
-    @PatchMapping("/monedas/{id}/estado")
+    @PatchMapping("/monedas/{codigoMoneda}/estado")
     @Operation(summary = "Cambiar estado de moneda")
-    public ResponseEntity<Void> cambiarEstadoMoneda(@PathVariable String id, @RequestParam String estado) {
-        service.cambiarEstadoMoneda(id, estado);
+    public ResponseEntity<Void> cambiarEstadoMoneda(@PathVariable String codigoMoneda, @RequestParam String estado) {
+        service.cambiarEstadoMoneda(codigoMoneda, estado);
         return ResponseEntity.ok().build();
     }
 } 

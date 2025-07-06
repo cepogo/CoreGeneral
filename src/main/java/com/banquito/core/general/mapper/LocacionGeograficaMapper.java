@@ -24,5 +24,5 @@ public interface LocacionGeograficaMapper {
     void updateFromEntity(LocacionGeografica source, @MappingTarget LocacionGeografica target);
     
     // Método para convertir a DTO embebido del modelo
-    com.banquito.core.general.modelo.LocacionGeograficaDTO toEmbeddedDTO(LocacionGeografica locacion);
+    LocacionGeograficaDTO toEmbeddedDTO(LocacionGeografica locacion);
 } 

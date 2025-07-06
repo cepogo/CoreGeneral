@@ -1,20 +1,11 @@
 package com.banquito.core.general.enums;
 
-public enum EstadoLocacionesGeograficasEnum {
+public class EstadoLocacionesGeograficasEnum {
 
-    ACTIVO("ACTIVO"),
-    INACTIVO("INACTIVO"),
-    MANTENIMIENTO("MANTENIMIENTO");
-
-    private final String valor;
-
-    EstadoLocacionesGeograficasEnum(String valor) {
-        this.valor = valor;
+    EstadoLocacionesGeograficasEnum() {
     }
 
-    public String getValor() {
-        return valor;
-    }
-
-
+    public static final String ACTIVO = "ACTIVO";
+    public static final String INACTIVO = "INACTIVO";
+    public static final String MANTENIMIENTO = "MANTENIMIENTO";
 }

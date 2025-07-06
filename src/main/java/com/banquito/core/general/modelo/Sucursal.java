@@ -1,8 +1,9 @@
 package com.banquito.core.general.modelo;
 
-import com.banquito.core.general.enums.EstadoSucursalesEnum;
+import com.banquito.core.general.dto.LocacionGeograficaDTO;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
@@ -18,18 +19,22 @@ public class Sucursal {
 
     @Id
     private String id;
-    private String entidadBancariaId;
-    private String locacionId;
-    private String codigo;
+    private String codigoEntidadBancaria;
+
+    @Indexed(unique = true)
+    private String codigoSucursal;
+
     private String nombre;
+    private LocacionGeograficaDTO locacionGeografica;
+
     private LocalDate fechaCreacion;
     private String correoElectronico;
     private String telefono;
     private String direccionLinea1;
     private String direccionLinea2;
-    private BigDecimal Latitud;
-    private BigDecimal Longitud;
-    private EstadoSucursalesEnum estado;
+    private BigDecimal latitud;
+    private BigDecimal longitud;
+    private String estado;
     private Long version;
 
     public Sucursal(String id) {

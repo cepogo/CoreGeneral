@@ -7,7 +7,7 @@ import org.mapstruct.factory.Mappers;
 import com.banquito.core.general.modelo.Moneda;
 import com.banquito.core.general.dto.MonedaDTO;
 
-@Mapper(componentModel = "spring", uses = {PaisMapper.class})
+@Mapper(componentModel = "spring")
 public interface MonedaMapper {
     MonedaMapper INSTANCE = Mappers.getMapper(MonedaMapper.class);
 

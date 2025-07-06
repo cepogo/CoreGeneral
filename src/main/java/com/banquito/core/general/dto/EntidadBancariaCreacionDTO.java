@@ -5,7 +5,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
+@Builder
 public class EntidadBancariaCreacionDTO {
     @NotNull(message = "El código local no puede ser nulo")
     @Size(max = 6, message = "El código local debe tener máximo 6 caracteres")
@@ -18,4 +21,6 @@ public class EntidadBancariaCreacionDTO {
     @NotNull(message = "El código internacional no puede ser nulo")
     @Size(max = 20, message = "El código internacional debe tener máximo 20 caracteres")
     private String codigoInternacional;
+
+    private List<String> codigosMoneda;
 }

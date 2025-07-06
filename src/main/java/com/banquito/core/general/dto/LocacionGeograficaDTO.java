@@ -8,7 +8,6 @@ import lombok.Data;
 @Data
 @Builder
 public class LocacionGeograficaDTO {
-    private String id;
 
     @NotNull(message = "El código de locación no puede ser nulo")
     @Size(min = 1, max = 10, message = "El código de locación debe tener entre 1 y 10 caracteres")

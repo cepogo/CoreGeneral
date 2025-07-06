@@ -2,8 +2,6 @@ package com.banquito.core.general.controlador;
 
 import com.banquito.core.general.dto.LocacionGeograficaDTO;
 import com.banquito.core.general.dto.FeriadoDTO;
-import com.banquito.core.general.enums.EstadoLocacionesGeograficasEnum;
-import com.banquito.core.general.enums.EstadoGeneralEnum;
 import com.banquito.core.general.dto.FeriadoCreacionDTO;
 import com.banquito.core.general.dto.FeriadoUpdateDTO;
 import com.banquito.core.general.dto.LocacionGeograficaCreacionDTO;
@@ -60,7 +58,7 @@ public class LocacionFeriadoControlador {
 
     @PatchMapping("/locaciones/{id}/estado")
     @Operation(summary = "Cambiar estado de locación geográfica")
-    public ResponseEntity<Void> cambiarEstadoLocacion(@PathVariable String id, @RequestParam EstadoLocacionesGeograficasEnum nuevoEstado) {
+    public ResponseEntity<Void> cambiarEstadoLocacion(@PathVariable String id, @RequestParam String nuevoEstado) {
         service.cambiarEstadoLocacionGeografica(id, nuevoEstado);
         return ResponseEntity.ok().build();
     }
@@ -86,7 +84,7 @@ public class LocacionFeriadoControlador {
 
     @PatchMapping("/feriados/{id}/estado")
     @Operation(summary = "Cambiar estado de feriado")
-    public ResponseEntity<Void> cambiarEstadoFeriado(@PathVariable String id, @RequestParam EstadoGeneralEnum nuevoEstado) {
+    public ResponseEntity<Void> cambiarEstadoFeriado(@PathVariable String id, @RequestParam String nuevoEstado) {
         Feriado feriado = service.obtenerFeriadoPorId(id);
         feriado.setEstado(nuevoEstado);
         service.cambiarEstadoFeriado(feriado);

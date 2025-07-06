@@ -1,10 +1,9 @@
 package com.banquito.core.general.controlador;
 
 import com.banquito.core.general.dto.*;
-import com.banquito.core.general.enums.EstadoGeneralEnum;
-import com.banquito.core.general.enums.EstadoSucursalesEnum;
 import com.banquito.core.general.mapper.EntidadBancariaMapper;
 import com.banquito.core.general.mapper.SucursalMapper;
+import com.banquito.core.general.modelo.EntidadBancaria;
 import com.banquito.core.general.modelo.Sucursal;
 import com.banquito.core.general.servicio.EntidadBancariaSucursalServicio;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,7 +58,7 @@ public class EntidadBancariaSucursalControlador {
             @ApiResponse(responseCode = "204", description = "Estado cambiado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Entidad no encontrada")
     })
-    public ResponseEntity<Void> cambiarEstadoEntidad(@PathVariable String codigoLocal, @RequestParam EstadoGeneralEnum estado) {
+    public ResponseEntity<Void> cambiarEstadoEntidad(@PathVariable String codigoLocal, @RequestParam String estado) {
         servicio.cambiarEstadoEntidadBancaria(codigoLocal, estado);
         return ResponseEntity.noContent().build();
     }
@@ -71,7 +70,7 @@ public class EntidadBancariaSucursalControlador {
             @ApiResponse(responseCode = "200", description = "Entidad encontrada"),
             @ApiResponse(responseCode = "404", description = "Entidad no encontrada")
     })
-    public ResponseEntity<EntidadBancariaDTO> obtenerEntidad(@PathVariable String codigoLocal) {
+    public ResponseEntity<EntidadBancaria> obtenerEntidad(@PathVariable String codigoLocal) {
         return ResponseEntity.ok(servicio.obtenerEntidadPorCodigoLocal(codigoLocal));
     }
 
@@ -84,6 +83,22 @@ public class EntidadBancariaSucursalControlador {
     })
     public ResponseEntity<SucursalDTO> crearSucursal(@PathVariable String entidadCodigoLocal, @Valid @RequestBody SucursalCreacionDTO dto) {
         return ResponseEntity.ok(sucursalMapper.toDTO(servicio.crearSucursal(entidadCodigoLocal, dto)));
+    }
+
+    @PutMapping("/{codigoLocal}/monedas")
+    @Operation(summary = "Agregar monedas a una Entidad Bancaria", description = "Asocia monedas a una entidad bancaria existente.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Monedas agregadas exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
+            @ApiResponse(responseCode = "404", description = "Entidad Bancaria o monedas no encontradas")
+    })
+    public ResponseEntity<EntidadBancariaDTO> agregarMonedasAEntidad( @PathVariable String codigoLocal, @RequestBody EntidadBancariaMonedaCreacionDTO dto) {
+        try {
+            EntidadBancariaDTO entidadActualizada = this.servicio.agregarMonedasAEntidad(codigoLocal, dto);
+            return ResponseEntity.ok(entidadActualizada);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/sucursales/{codigo}")
@@ -114,18 +129,18 @@ public class EntidadBancariaSucursalControlador {
             @ApiResponse(responseCode = "400", description = "No se puede activar la sucursal si su entidad o locación están inactivas"),
             @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
     })
-    public ResponseEntity<Void> cambiarEstadoSucursal(@PathVariable String codigo, @RequestParam EstadoSucursalesEnum estado) {
+    public ResponseEntity<Void> cambiarEstadoSucursal(@PathVariable String codigo, @RequestParam String estado) {
         servicio.cambiarEstadoSucursal(codigo, estado);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/sucursales/locacion/{locacionId}")
-    @Operation(summary = "Listar sucursales activas por locación", description = "Obtiene una lista de todas las sucursales activas para un ID de locación geográfica específico.")
+    @GetMapping("/sucursales/locacion/{codigoLocacion}")
+    @Operation(summary = "Listar sucursales activas por locación", description = "Obtiene una lista de todas las sucursales activas para una locación geográfica específico.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Listado obtenido exitosamente")
     })
-    public ResponseEntity<List<SucursalDTO>> listarSucursalesPorLocacion(@PathVariable String locacionId) {
-        List<Sucursal> sucursales = servicio.listarSucursalesActivasPorLocacion(locacionId);
+    public ResponseEntity<List<SucursalDTO>> listarSucursalesPorLocacion(@PathVariable String codigoLocacion) {
+        List<Sucursal> sucursales = servicio.listarSucursalesActivasPorCodigoLocacion(codigoLocacion);
         return ResponseEntity.ok(sucursales.stream().map(sucursalMapper::toDTO).collect(Collectors.toList()));
     }
 }
