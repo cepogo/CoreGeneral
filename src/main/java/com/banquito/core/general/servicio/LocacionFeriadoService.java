@@ -98,7 +98,7 @@ public class LocacionFeriadoService {
         return prefijo + anio;
     }
 
-    public Feriado crearFeriado(Feriado feriado, String locacionId) {
+    public Feriado crearFeriado(Feriado feriado, String codigoLocacion) {
         log.info("Iniciando creación de feriado '{}', tipo {}", feriado.getNombre(), feriado.getTipo());
         
         // Generar código de feriado automáticamente
@@ -107,12 +107,12 @@ public class LocacionFeriadoService {
         log.info("Código de feriado generado: {}", codigoFeriado);
         
         if ("LOCAL".equals(feriado.getTipo())) {
-            if (locacionId == null || locacionId.isEmpty()) {
+            if (codigoLocacion == null || codigoLocacion.isEmpty()) {
                 throw new CrearEntidadException("Feriado", "Para feriados locales debe especificar una locación.");
             }
             
-            LocacionGeografica locacion = locacionGeograficaRepositorio.findById(locacionId)
-                .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la locación con ID: " + locacionId, null, "LocacionGeografica"));
+            LocacionGeografica locacion = locacionGeograficaRepositorio.findByCodigoLocacion(codigoLocacion)
+                .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la locación con código: " + codigoLocacion, null, "LocacionGeografica"));
             
             LocacionGeograficaDTO locacionEmbebida = locacionMapper.toEmbeddedDTO(locacion);
             feriado.setLocacion(locacionEmbebida);

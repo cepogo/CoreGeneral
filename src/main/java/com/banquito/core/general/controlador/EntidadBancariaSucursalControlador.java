@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/banco")
+@RequestMapping("/api/banco")
 @Tag(name = "Entidades y Sucursales", description = "Gestiona las Entidades Bancarias y sus Sucursales")
 public class EntidadBancariaSucursalControlador {
 
@@ -62,17 +62,6 @@ public class EntidadBancariaSucursalControlador {
         return ResponseEntity.noContent().build();
     }
 
-
-    @GetMapping("/{codigoLocal}")
-    @Operation(summary = "Obtener entidad bancaria por codigoLocal", description = "Busca y devuelve una entidad bancaria por su clave primaria.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Entidad encontrada"),
-            @ApiResponse(responseCode = "404", description = "Entidad no encontrada")
-    })
-    public ResponseEntity<EntidadBancariaDTO> obtenerEntidad(@PathVariable String codigoLocal) {
-        return ResponseEntity.ok(entidadMapper.toDTO(servicio.obtenerEntidadPorCodigoLocal(codigoLocal)));
-    }
-
     @PostMapping("/{entidadCodigoLocal}/sucursales")
     @Operation(summary = "Crear una nueva Sucursal para una Entidad", description = "Crea una nueva sucursal y la asocia a una entidad bancaria existente.")
     @ApiResponses({
@@ -100,14 +89,25 @@ public class EntidadBancariaSucursalControlador {
         }
     }
 
-    @GetMapping("/sucursales/{codigo}")
-    @Operation(summary = "Obtener sucursal por codigo", description = "Busca y devuelve la sucursal por su codigo.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Sucursal encontrada"),
-            @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
+    // ================= SUCURSALES =================
+
+    @GetMapping("/sucursales")
+    @Operation(summary = "Listar sucursales por nivel geográfico", description = "Filtra sucursales por provincia o cantón. Use nivel=provincia para ver todas las sucursales de una provincia, o nivel=canton para ver sucursales de un cantón específico.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Listado obtenido exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
     })
-    public ResponseEntity<SucursalDTO> obtenerSucursalPorCodigo(@PathVariable String codigo) {
-        return ResponseEntity.ok(sucursalMapper.toDTO(servicio.obtenerSucursalPorCodigo(codigo)));
+    public ResponseEntity<List<SucursalDTO>> listarSucursalesPorNivel(
+            @RequestParam(defaultValue = "provincia") String nivel,
+            @RequestParam(required = false) String codigoProvincia,
+            @RequestParam(required = false) String codigoCanton) {
+        
+        List<Sucursal> sucursales = servicio.listarSucursalesPorNivel(nivel, codigoProvincia, codigoCanton);
+        List<SucursalDTO> sucursalesDTO = sucursales.stream()
+                .map(sucursalMapper::toDTO)
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(sucursalesDTO);
     }
 
     @PutMapping("/sucursales/{codigo}")
@@ -131,15 +131,5 @@ public class EntidadBancariaSucursalControlador {
     public ResponseEntity<Void> cambiarEstadoSucursal(@PathVariable String codigo, @RequestParam String estado) {
         servicio.cambiarEstadoSucursal(codigo, estado);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/sucursales/locacion/{codigoLocacion}")
-    @Operation(summary = "Listar sucursales activas por locación", description = "Obtiene una lista de todas las sucursales activas para una locación geográfica específico.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Listado obtenido exitosamente")
-    })
-    public ResponseEntity<List<SucursalDTO>> listarSucursalesPorLocacion(@PathVariable String codigoLocacion) {
-        List<Sucursal> sucursales = servicio.listarSucursalesActivasPorCodigoLocacion(codigoLocacion);
-        return ResponseEntity.ok(sucursales.stream().map(sucursalMapper::toDTO).collect(Collectors.toList()));
     }
 }

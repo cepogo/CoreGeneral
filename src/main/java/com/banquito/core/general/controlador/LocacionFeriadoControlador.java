@@ -84,7 +84,7 @@ public class LocacionFeriadoControlador {
     @Operation(summary = "Crear feriado")
     public ResponseEntity<FeriadoDTO> crearFeriado(@Valid @RequestBody FeriadoCreacionDTO dto) {
         Feriado feriado = feriadoMapper.toEntity(dto);
-        Feriado creado = service.crearFeriado(feriado, dto.getLocacionId());
+        Feriado creado = service.crearFeriado(feriado, dto.getCodigoLocacion());
         return ResponseEntity.ok(feriadoMapper.toDTO(creado));
     }
 

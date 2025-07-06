@@ -1,9 +1,10 @@
 package com.banquito.core.general.modelo;
 
-import com.banquito.core.general.dto.MonedaDTO;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.banquito.core.general.dto.MonedaDTO;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

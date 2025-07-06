@@ -22,7 +22,7 @@ public class FeriadoCreacionDTO {
     @NotNull(message = "El tipo no puede ser nulo")
     private String tipo;
 
-    // Para feriados LOCALES, este campo debe contener el ID de la locación.
+    // Para feriados LOCALES, este campo debe contener el código de la locación.
     // Para feriados NACIONALES, puede ser nulo.
-    private String locacionId;
+    private String codigoLocacion;
 } 

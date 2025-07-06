@@ -18,20 +18,20 @@ public class LocacionGeograficaDTO {
     private String codigoPais;
 
     @NotNull(message = "El código de provincia no puede ser nulo")
-    @Size(min = 1, max = 4, message = "El código de provincia debe tener entre 1 y 4 caracteres")
+    @Size(min = 1, max = 6, message = "El código de provincia debe tener entre 1 y 4 caracteres")
     private String codigoProvincia;
 
     @NotNull(message = "El nombre de la provincia no puede ser nulo")
     @Size(min = 1, max = 100, message = "El nombre de la provincia debe tener entre 1 y 100 caracteres")
     private String provincia;
 
-    @Size(max = 4, message = "El código de cantón no debe exceder los 4 caracteres")
+    @Size(max = 6, message = "El código de cantón no debe exceder los 4 caracteres")
     private String codigoCanton;
 
     @Size(max = 100, message = "El nombre del cantón no debe exceder los 100 caracteres")
     private String canton;
 
-    @Size(max = 4, message = "El código de parroquia no debe exceder los 4 caracteres")
+    @Size(max = 6, message = "El código de parroquia no debe exceder los 4 caracteres")
     private String codigoParroquia;
 
     @Size(max = 100, message = "El nombre de la parroquia no debe exceder los 100 caracteres")

@@ -12,4 +12,8 @@ public interface SucursalRepositorio extends MongoRepository<Sucursal, String> {
     List<Sucursal> findByCodigoEntidadBancaria(String codigoEntidadBancaria);
     List<Sucursal> findByLocacionGeografica_CodigoLocacionAndEstado(String codigoLocacion, String estado);
     Optional<Sucursal> findByCodigoSucursal(String codigoSucursal);
+    
+    // Métodos para filtrado por nivel geográfico
+    List<Sucursal> findByEstadoAndLocacionGeografica_CodigoProvincia(String estado, String codigoProvincia);
+    List<Sucursal> findByEstadoAndLocacionGeografica_CodigoProvinciaAndLocacionGeografica_CodigoCanton(String estado, String codigoProvincia, String codigoCanton);
 }

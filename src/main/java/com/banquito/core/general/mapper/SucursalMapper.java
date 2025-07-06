@@ -19,6 +19,4 @@ public interface SucursalMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDTO(SucursalUpdateDTO dto, @MappingTarget Sucursal sucursal);
-
-
 }

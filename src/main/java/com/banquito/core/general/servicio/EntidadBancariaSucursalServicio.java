@@ -1,6 +1,20 @@
 package com.banquito.core.general.servicio;
 
-import com.banquito.core.general.dto.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.banquito.core.general.dto.EntidadBancariaCreacionDTO;
+import com.banquito.core.general.dto.EntidadBancariaDTO;
+import com.banquito.core.general.dto.EntidadBancariaMonedaCreacionDTO;
+import com.banquito.core.general.dto.MonedaDTO;
+import com.banquito.core.general.dto.SucursalCreacionDTO;
+import com.banquito.core.general.dto.SucursalUpdateDTO;
 import com.banquito.core.general.excepcion.ActualizarEntidadException;
 import com.banquito.core.general.excepcion.CrearEntidadException;
 import com.banquito.core.general.excepcion.EntidadNoEncontradaException;
@@ -16,15 +30,8 @@ import com.banquito.core.general.repositorio.EntidadBancariaRepositorio;
 import com.banquito.core.general.repositorio.LocacionGeograficaRepositorio;
 import com.banquito.core.general.repositorio.MonedaRepositorio;
 import com.banquito.core.general.repositorio.SucursalRepositorio;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -223,10 +230,32 @@ public class EntidadBancariaSucursalServicio {
         }
     }
 
-    public List<Sucursal> listarSucursalesActivasPorCodigoLocacion(String codigoLocacion) {
-        log.info("Listando sucursales activas para la locación con código: {}", codigoLocacion);
-        List<Sucursal> sucursales = sucursalRepositorio.findByLocacionGeografica_CodigoLocacionAndEstado(codigoLocacion, "ACTIVO");
-        log.info("Se encontraron {} sucursales activas para la locación {}", sucursales.size(), codigoLocacion);
+    public List<Sucursal> listarSucursalesPorNivel(String nivel, String codigoProvincia, String codigoCanton) {
+        log.info("Listando sucursales para nivel: {}, provincia: {}, cantón: {}", nivel, codigoProvincia, codigoCanton);
+        
+        List<Sucursal> sucursales;
+        
+        switch (nivel != null ? nivel.toLowerCase() : "provincia") {
+            case "provincia":
+                if (codigoProvincia == null || codigoProvincia.isEmpty()) {
+                    throw new IllegalArgumentException("Para listar sucursales por provincia debe especificar el código de provincia");
+                }
+                sucursales = sucursalRepositorio.findByEstadoAndLocacionGeografica_CodigoProvincia("ACTIVO", codigoProvincia);
+                log.info("Se encontraron {} sucursales para la provincia {}", sucursales.size(), codigoProvincia);
+                break;
+                
+            case "canton":
+                if (codigoProvincia == null || codigoProvincia.isEmpty() || codigoCanton == null || codigoCanton.isEmpty()) {
+                    throw new IllegalArgumentException("Para listar sucursales por cantón debe especificar el código de provincia y cantón");
+                }
+                sucursales = sucursalRepositorio.findByEstadoAndLocacionGeografica_CodigoProvinciaAndLocacionGeografica_CodigoCanton("ACTIVO", codigoProvincia, codigoCanton);
+                log.info("Se encontraron {} sucursales para el cantón {} de la provincia {}", sucursales.size(), codigoCanton, codigoProvincia);
+                break;
+                
+            default:
+                throw new IllegalArgumentException("Nivel no válido. Use: provincia, o canton");
+        }
+        
         return sucursales;
     }
 }

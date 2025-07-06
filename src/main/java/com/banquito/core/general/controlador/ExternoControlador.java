@@ -1,22 +1,21 @@
 package com.banquito.core.general.controlador;
 
-import com.banquito.core.general.dto.*;
-import com.banquito.core.general.mapper.MonedaMapper;
-import com.banquito.core.general.mapper.EntidadBancariaMapper;
-import com.banquito.core.general.mapper.LocacionGeograficaMapper;
 import com.banquito.core.general.modelo.Moneda;
 import com.banquito.core.general.modelo.EntidadBancaria;
 import com.banquito.core.general.modelo.LocacionGeografica;
+import com.banquito.core.general.modelo.Sucursal;
+import com.banquito.core.general.modelo.Pais;
 import com.banquito.core.general.repositorio.MonedaRepositorio;
 import com.banquito.core.general.repositorio.EntidadBancariaRepositorio;
 import com.banquito.core.general.repositorio.LocacionGeograficaRepositorio;
+import com.banquito.core.general.repositorio.SucursalRepositorio;
+import com.banquito.core.general.repositorio.PaisRepositorio;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -28,9 +27,8 @@ public class ExternoControlador {
     private final MonedaRepositorio monedaRepositorio;
     private final EntidadBancariaRepositorio entidadBancariaRepositorio;
     private final LocacionGeograficaRepositorio locacionGeograficaRepositorio;
-    private final MonedaMapper monedaMapper;
-    private final EntidadBancariaMapper entidadBancariaMapper;
-    private final LocacionGeograficaMapper locacionMapper;
+    private final SucursalRepositorio sucursalRepositorio;
+    private final PaisRepositorio paisRepositorio;
 
     // ================= MONEDAS =================
     @GetMapping("/monedas/{codigoMoneda}")
@@ -54,5 +52,21 @@ public class ExternoControlador {
     public ResponseEntity<Boolean> existeLocacion(@PathVariable String codigoLocacion) {
         Optional<LocacionGeografica> locacion = locacionGeograficaRepositorio.findByCodigoLocacion(codigoLocacion);
         return ResponseEntity.ok(locacion.isPresent() && "ACTIVO".equals(locacion.get().getEstado()));
+    }
+
+    // ================= SUCURSALES =================
+    @GetMapping("/sucursales/{codigoSucursal}")
+    @Operation(summary = "Verificar si existe una sucursal por código")
+    public ResponseEntity<Boolean> existeSucursal(@PathVariable String codigoSucursal) {
+        Optional<Sucursal> sucursal = sucursalRepositorio.findByCodigoSucursal(codigoSucursal);
+        return ResponseEntity.ok(sucursal.isPresent() && "ACTIVO".equals(sucursal.get().getEstado()));
+    }
+
+    // ================= PAÍSES =================
+    @GetMapping("/paises/{codigoPais}")
+    @Operation(summary = "Verificar si existe un país por código")
+    public ResponseEntity<Boolean> existePais(@PathVariable String codigoPais) {
+        Pais pais = paisRepositorio.findByCodigoPais(codigoPais);
+        return ResponseEntity.ok(pais != null && "ACTIVO".equals(pais.getEstado()));
     }
 } 
