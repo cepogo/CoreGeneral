@@ -2,6 +2,8 @@ package com.banquito.core.general.servicio;
 
 import com.banquito.core.general.dto.MonedaDTO;
 import com.banquito.core.general.dto.PaisDTO;
+import com.banquito.core.general.excepcion.CrearEntidadException;
+import com.banquito.core.general.excepcion.EntidadNoEncontradaException;
 import com.banquito.core.general.mapper.MonedaMapper;
 import com.banquito.core.general.mapper.PaisMapper;
 import com.banquito.core.general.modelo.Moneda;
@@ -30,13 +32,13 @@ public class PaisMonedaService {
     @Transactional
     public PaisDTO crearPais(PaisDTO paisDTO) {
         if (paisRepositorio.findByCodigoPais(paisDTO.getCodigoPais()) != null) {
-            throw new RuntimeException("Ya existe un país con el código: " + paisDTO.getCodigoPais());
+            throw new CrearEntidadException("Pais", "Ya existe un país con el código: " + paisDTO.getCodigoPais());
         }
         Pais pais = paisMapper.toEntity(paisDTO);
         if (paisDTO.getCodigoMoneda() != null) {
             Moneda moneda = monedaRepositorio.findByCodigoMoneda(paisDTO.getCodigoMoneda());
             if (moneda == null) {
-                throw new RuntimeException("Moneda no encontrada con código: " + paisDTO.getCodigoMoneda());
+                throw new EntidadNoEncontradaException("Moneda no encontrada con código: " + paisDTO.getCodigoMoneda(), 2, "Moneda");
             }
             pais.setMoneda(monedaMapper.toDTO(moneda));
         }
@@ -56,11 +58,12 @@ public class PaisMonedaService {
     public PaisDTO agregarMonedaAPais(String codigoPais, String codigoMoneda) {
         Pais pais = paisRepositorio.findByCodigoPais(codigoPais);
         if (pais == null) {
-            throw new RuntimeException("País no encontrado con código: " + codigoPais);
+            throw new EntidadNoEncontradaException("País no encontrado con código: " + codigoPais, 2, "Pais");
+
         }
         Moneda moneda = monedaRepositorio.findByCodigoMoneda(codigoMoneda);
         if (moneda == null) {
-            throw new RuntimeException("Moneda no encontrada con código: " + codigoMoneda);
+            throw new EntidadNoEncontradaException("Moneda no encontrada con código: " + codigoMoneda, 2, "Moneda");
         }
         pais.setMoneda(monedaMapper.toDTO(moneda));
         pais.setVersion(pais.getVersion() != null ? pais.getVersion() + 1 : 1L);
@@ -71,7 +74,7 @@ public class PaisMonedaService {
     public void cambiarEstadoPais(String codigoPais, String nuevoEstado) {
         Pais pais = paisRepositorio.findByCodigoPais(codigoPais);
         if (pais == null) {
-            throw new RuntimeException("País no encontrado con código: " + codigoPais);
+            throw new EntidadNoEncontradaException("País no encontrado con código: " + codigoPais, 2, "Pais");
         }
         pais.setEstado(nuevoEstado);
         pais.setVersion(pais.getVersion() != null ? pais.getVersion() + 1 : 1L);
@@ -82,7 +85,7 @@ public class PaisMonedaService {
     public MonedaDTO crearMoneda(MonedaDTO monedaDTO) {
 
         if (monedaRepositorio.findByCodigoMoneda(monedaDTO.getCodigoMoneda()) != null) {
-            throw new RuntimeException("Ya existe una moneda con el código: " + monedaDTO.getCodigoMoneda());
+            throw new CrearEntidadException("Moneda", "Ya existe una moneda con el código: " + monedaDTO.getCodigoMoneda());
         }
         
         Moneda moneda = monedaMapper.toEntity(monedaDTO);
@@ -100,7 +103,7 @@ public class PaisMonedaService {
     public MonedaDTO obtenerMonedaPorCodigo(String codigoMoneda) {
             Moneda moneda = monedaRepositorio.findByCodigoMoneda(codigoMoneda);
             if (moneda == null) {
-                throw new RuntimeException("Moneda no encontrada con código: " + codigoMoneda);
+                throw new EntidadNoEncontradaException("Moneda no encontrada con código: " + codigoMoneda, 2, "Moneda");
             }
             return monedaMapper.toDTO(moneda);
         }
@@ -116,7 +119,7 @@ public class PaisMonedaService {
     public void cambiarEstadoMoneda(String codigoMoneda, String nuevoEstado) {
         Moneda moneda = monedaRepositorio.findByCodigoMoneda(codigoMoneda);
         if (moneda == null) {
-            throw new RuntimeException("Moneda no encontrada con código: " + codigoMoneda);
+            throw new EntidadNoEncontradaException("Moneda no encontrada con código: " + codigoMoneda, 2, "Moneda");
         }
 
 
