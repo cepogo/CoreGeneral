@@ -43,21 +43,12 @@ public class LocacionFeriadoService {
         }
     }
 
-    public LocacionGeografica modificarLocacionGeografica(String idLocacion, LocacionGeografica cambios) {
-        log.info("Iniciando modificación de locación geográfica con ID: {}", idLocacion);
-        LocacionGeografica entity = this.locacionGeograficaRepositorio.findById(idLocacion)
-                .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada", 2, "LocacionGeografica"));
-        try {
-            locacionMapper.updateFromEntity(cambios, entity);
-            entity.setVersion(entity.getVersion() == null ? 1L : entity.getVersion() + 1L);
-            LocacionGeografica savedEntity = this.locacionGeograficaRepositorio.save(entity);
-            log.info("Locación geográfica con ID {} modificada exitosamente.", savedEntity.getId());
-            return savedEntity;
-        } catch (Exception e) {
-            log.error("Error al modificar locación geográfica {}: {}", idLocacion, e.getMessage(), e);
-            throw new ActualizarEntidadException("LocacionGeografica", "Error al modificar la locación geográfica: " + e.getMessage());
+    public LocacionGeografica obtenerLocacionPorCodigo(String codigoLocacion) {
+            log.info("Buscando locación geográfica con código: {}", codigoLocacion);
+            return locacionGeograficaRepositorio.findByCodigoLocacion(codigoLocacion)
+                    .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada con código: " + codigoLocacion, null, "LocacionGeografica"));
         }
-    }
+
 
     public List<LocacionGeografica> listarLocacionesActivas() {
         log.info("Listando todas las locaciones geográficas activas");

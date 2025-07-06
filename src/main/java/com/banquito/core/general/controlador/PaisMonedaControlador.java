@@ -27,13 +27,6 @@ public class PaisMonedaControlador {
         return ResponseEntity.ok(creado);
     }
 
-    @GetMapping("/paises")
-    @Operation(summary = "Listar países")
-    public ResponseEntity<List<PaisDTO>> listarPaises() {
-        List<PaisDTO> dtos = service.listarPaises();
-        return ResponseEntity.ok(dtos);
-    }
-
     @GetMapping("/paises/estado/{estado}")
     @Operation(summary = "Listar países por estado")
     public ResponseEntity<List<PaisDTO>> listarPaisesPorEstado(@PathVariable String estado) {
@@ -41,18 +34,19 @@ public class PaisMonedaControlador {
         return ResponseEntity.ok(dtos);
     }
 
-    @PutMapping("/paises/{codigoPais}")
-    @Operation(summary = "Modificar país")
-    public ResponseEntity<PaisDTO> actualizarPais(@PathVariable String codigoPais, @Valid @RequestBody PaisDTO dto) {
-        PaisDTO actualizado = service.actualizarPais(codigoPais, dto);
-        return ResponseEntity.ok(actualizado);
-    }
 
     @PatchMapping("/paises/{codigoPais}/estado")
     @Operation(summary = "Cambiar estado de país")
     public ResponseEntity<Void> cambiarEstadoPais(@PathVariable String codigoPais, @RequestParam String estado) {
         service.cambiarEstadoPais(codigoPais, estado);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/paises/{codigoPais}/moneda/{codigoMoneda}")
+    @Operation(summary = "Agregar o actualizar la moneda de un país")
+    public ResponseEntity<PaisDTO> agregarMonedaAPais(@PathVariable String codigoPais, @PathVariable String codigoMoneda) {
+        PaisDTO paisActualizado = service.agregarMonedaAPais(codigoPais, codigoMoneda);
+        return ResponseEntity.ok(paisActualizado);
     }
 
     // ================= MONEDAS =================
@@ -64,6 +58,13 @@ public class PaisMonedaControlador {
         return ResponseEntity.ok(creado);
     }
 
+    @GetMapping("/monedas/{codigoMoneda}")
+    @Operation(summary = "Obtener moneda por código")
+    public ResponseEntity<MonedaDTO> obtenerMonedaPorCodigo(@PathVariable String codigoMoneda) {
+        MonedaDTO moneda = service.obtenerMonedaPorCodigo(codigoMoneda);
+        return ResponseEntity.ok(moneda);
+    }
+
     @GetMapping("/monedas/estado/{estado}")
     @Operation(summary = "Listar monedas por estado")
     public ResponseEntity<List<MonedaDTO>> listarMonedasPorEstado(@PathVariable String estado) {
@@ -71,12 +72,6 @@ public class PaisMonedaControlador {
         return ResponseEntity.ok(dtos);
     }
 
-    @PutMapping("/monedas/{codigoMoneda}")
-    @Operation(summary = "Modificar moneda")
-    public ResponseEntity<MonedaDTO> actualizarMoneda(@PathVariable String codigoMoneda, @Valid @RequestBody MonedaDTO dto) {
-        MonedaDTO actualizado = service.actualizarMoneda(codigoMoneda, dto);
-        return ResponseEntity.ok(actualizado);
-    }
 
     @PatchMapping("/monedas/{codigoMoneda}/estado")
     @Operation(summary = "Cambiar estado de moneda")

@@ -46,12 +46,6 @@ public class PaisMonedaService {
         return paisMapper.toDTO(paisRepositorio.save(pais));
     }
 
-    public List<PaisDTO> listarPaises() {
-        return paisRepositorio.findAll().stream()
-                .map(paisMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
     public List<PaisDTO> listarPaisesPorEstado(String estado) {
         return paisRepositorio.findByEstado(estado).stream()
                 .map(paisMapper::toDTO)
@@ -59,24 +53,17 @@ public class PaisMonedaService {
     }
 
     @Transactional
-    public PaisDTO actualizarPais(String codigoPais, PaisDTO paisDTO) {
+    public PaisDTO agregarMonedaAPais(String codigoPais, String codigoMoneda) {
         Pais pais = paisRepositorio.findByCodigoPais(codigoPais);
         if (pais == null) {
             throw new RuntimeException("País no encontrado con código: " + codigoPais);
         }
-        
-        paisMapper.updateFromDTO(paisDTO, pais);
-
-        if (paisDTO.getCodigoMoneda() != null) {
-            Moneda moneda = monedaRepositorio.findByCodigoMoneda(paisDTO.getCodigoMoneda());
-            if (moneda == null) {
-                throw new RuntimeException("Moneda no encontrada con código: " + paisDTO.getCodigoMoneda());
-            }
-            pais.setMoneda(monedaMapper.toDTO(moneda));
+        Moneda moneda = monedaRepositorio.findByCodigoMoneda(codigoMoneda);
+        if (moneda == null) {
+            throw new RuntimeException("Moneda no encontrada con código: " + codigoMoneda);
         }
-
+        pais.setMoneda(monedaMapper.toDTO(moneda));
         pais.setVersion(pais.getVersion() != null ? pais.getVersion() + 1 : 1L);
-        
         return paisMapper.toDTO(paisRepositorio.save(pais));
     }
 
@@ -110,6 +97,13 @@ public class PaisMonedaService {
                 .map(monedaMapper::toDTO)
                 .collect(Collectors.toList());
     }
+    public MonedaDTO obtenerMonedaPorCodigo(String codigoMoneda) {
+            Moneda moneda = monedaRepositorio.findByCodigoMoneda(codigoMoneda);
+            if (moneda == null) {
+                throw new RuntimeException("Moneda no encontrada con código: " + codigoMoneda);
+            }
+            return monedaMapper.toDTO(moneda);
+        }
 
     public List<MonedaDTO> listarMonedasPorEstado(String estado) {
         return monedaRepositorio.findByEstado(estado).stream()
@@ -117,18 +111,6 @@ public class PaisMonedaService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public MonedaDTO actualizarMoneda(String codigoMoneda, MonedaDTO monedaDTO) {
-        Moneda moneda = monedaRepositorio.findByCodigoMoneda(codigoMoneda);
-        if (moneda == null) {
-            throw new RuntimeException("Moneda no encontrada con código: " + codigoMoneda);
-        }
-        
-        monedaMapper.updateFromDTO(monedaDTO, moneda);
-        moneda.setVersion(moneda.getVersion() != null ? moneda.getVersion() + 1 : 1L);
-        
-        return monedaMapper.toDTO(monedaRepositorio.save(moneda));
-    }
 
     @Transactional
     public void cambiarEstadoMoneda(String codigoMoneda, String nuevoEstado) {

@@ -3,7 +3,6 @@ package com.banquito.core.general.controlador;
 import com.banquito.core.general.dto.*;
 import com.banquito.core.general.mapper.EntidadBancariaMapper;
 import com.banquito.core.general.mapper.SucursalMapper;
-import com.banquito.core.general.modelo.EntidadBancaria;
 import com.banquito.core.general.modelo.Sucursal;
 import com.banquito.core.general.servicio.EntidadBancariaSucursalServicio;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,8 +69,8 @@ public class EntidadBancariaSucursalControlador {
             @ApiResponse(responseCode = "200", description = "Entidad encontrada"),
             @ApiResponse(responseCode = "404", description = "Entidad no encontrada")
     })
-    public ResponseEntity<EntidadBancaria> obtenerEntidad(@PathVariable String codigoLocal) {
-        return ResponseEntity.ok(servicio.obtenerEntidadPorCodigoLocal(codigoLocal));
+    public ResponseEntity<EntidadBancariaDTO> obtenerEntidad(@PathVariable String codigoLocal) {
+        return ResponseEntity.ok(entidadMapper.toDTO(servicio.obtenerEntidadPorCodigoLocal(codigoLocal)));
     }
 
     @PostMapping("/{entidadCodigoLocal}/sucursales")
@@ -107,8 +106,8 @@ public class EntidadBancariaSucursalControlador {
             @ApiResponse(responseCode = "200", description = "Sucursal encontrada"),
             @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
     })
-    public ResponseEntity<Sucursal> obtenerSucursalPorCodigo(@PathVariable String codigo) {
-        return ResponseEntity.ok(servicio.obtenerSucursalPorCodigo(codigo));
+    public ResponseEntity<SucursalDTO> obtenerSucursalPorCodigo(@PathVariable String codigo) {
+        return ResponseEntity.ok(sucursalMapper.toDTO(servicio.obtenerSucursalPorCodigo(codigo)));
     }
 
     @PutMapping("/sucursales/{codigo}")

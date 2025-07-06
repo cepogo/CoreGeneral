@@ -3,7 +3,6 @@ package com.banquito.core.general.controlador;
 import com.banquito.core.general.dto.LocacionGeograficaDTO;
 import com.banquito.core.general.dto.FeriadoDTO;
 import com.banquito.core.general.dto.FeriadoCreacionDTO;
-import com.banquito.core.general.dto.FeriadoUpdateDTO;
 import com.banquito.core.general.dto.LocacionGeograficaCreacionDTO;
 import com.banquito.core.general.mapper.LocacionGeograficaMapper;
 import com.banquito.core.general.mapper.FeriadoMapper;
@@ -38,13 +37,14 @@ public class LocacionFeriadoControlador {
         return ResponseEntity.ok(locacionMapper.toDTO(creada));
     }
 
-    @PutMapping("/locaciones/{id}")
-    @Operation(summary = "Modificar locación geográfica")
-    public ResponseEntity<LocacionGeograficaDTO> modificarLocacion(@PathVariable String id, @Valid @RequestBody LocacionGeograficaDTO dto) {
-        LocacionGeografica cambios = locacionMapper.toPersistence(dto);
-        LocacionGeografica actualizada = service.modificarLocacionGeografica(id, cambios);
-        return ResponseEntity.ok(locacionMapper.toDTO(actualizada));
+    @GetMapping("/locaciones/codigo/{codigoLocacion}")
+    @Operation(summary = "Obtener locación geográfica por código")
+    public ResponseEntity<LocacionGeograficaDTO> obtenerLocacionPorCodigo(@PathVariable String codigoLocacion) {
+        LocacionGeografica locacion = service.obtenerLocacionPorCodigo(codigoLocacion);
+        return ResponseEntity.ok(locacionMapper.toDTO(locacion));
     }
+
+
 
     @GetMapping("/locaciones/activas")
     @Operation(summary = "Listar locaciones geográficas activas")
@@ -73,14 +73,6 @@ public class LocacionFeriadoControlador {
         return ResponseEntity.ok(feriadoMapper.toDTO(creado));
     }
 
-    @PutMapping("/feriados/{id}")
-    @Operation(summary = "Modificar feriado")
-    public ResponseEntity<FeriadoDTO> modificarFeriado(@PathVariable String id, @Valid @RequestBody FeriadoUpdateDTO dto) {
-        Feriado feriado = service.obtenerFeriadoPorId(id);
-        feriadoMapper.updateFromDTO(dto, feriado);
-        Feriado actualizado = service.modificarFeriado(feriado);
-        return ResponseEntity.ok(feriadoMapper.toDTO(actualizado));
-    }
 
     @PatchMapping("/feriados/{id}/estado")
     @Operation(summary = "Cambiar estado de feriado")
