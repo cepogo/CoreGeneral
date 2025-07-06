@@ -21,7 +21,7 @@ import java.util.List;
 @Tag(name = "Locaciones y Feriados", description = "Operaciones para locaciones geográficas y feriados")
 public class LocacionFeriadoControlador {
     private final LocacionFeriadoService service;
-    private final LocacionGeograficaMapper locacionMapper;
+    private final LocacionGeograficaMapper locacionGeograficaMapper;
     private final FeriadoMapper feriadoMapper;
 
     // ================= LOCACIONES =================
@@ -29,9 +29,9 @@ public class LocacionFeriadoControlador {
     @PostMapping("/locaciones")
     @Operation(summary = "Crear locación geográfica")
     public ResponseEntity<LocacionGeograficaDTO> crearLocacion(@Valid @RequestBody LocacionGeograficaCreacionDTO dto) {
-        LocacionGeografica entity = locacionMapper.toEntity(dto);
+        LocacionGeografica entity = locacionGeograficaMapper.toEntity(dto);
         LocacionGeografica creada = service.crearLocacionGeografica(entity);
-        return ResponseEntity.ok(locacionMapper.toDTO(creada));
+        return ResponseEntity.ok(locacionGeograficaMapper.toDTO(creada));
     }
 
     @GetMapping("/locaciones")
@@ -47,25 +47,25 @@ public class LocacionFeriadoControlador {
         switch (nivel.toLowerCase()) {
             case "provincia":
                 List<ProvinciaDTO> provincias = locaciones.stream()
-                        .map(locacionMapper::toProvinciaDTO)
+                        .map(locacionGeograficaMapper::toProvinciaDTO)
                         .toList();
                 return ResponseEntity.ok(provincias);
                 
             case "canton":
                 List<CantonDTO> cantones = locaciones.stream()
-                        .map(locacionMapper::toCantonDTO)
+                        .map(locacionGeograficaMapper::toCantonDTO)
                         .toList();
                 return ResponseEntity.ok(cantones);
                 
             case "parroquia":
                 List<ParroquiaDTO> parroquias = locaciones.stream()
-                        .map(locacionMapper::toParroquiaDTO)
+                        .map(locacionGeograficaMapper::toParroquiaDTO)
                         .toList();
                 return ResponseEntity.ok(parroquias);
                 
             default:
                 List<LocacionGeograficaDTO> dtos = locaciones.stream()
-                        .map(locacionMapper::toDTO)
+                        .map(locacionGeograficaMapper::toDTO)
                         .toList();
                 return ResponseEntity.ok(dtos);
         }

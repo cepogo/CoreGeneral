@@ -22,7 +22,7 @@ import java.util.List;
 public class LocacionFeriadoService {
     private final LocacionGeograficaRepositorio locacionGeograficaRepositorio;
     private final FeriadosRepositorio feriadosRepositorio;
-    private final LocacionGeograficaMapper locacionMapper;
+    private final LocacionGeograficaMapper locacionGeograficaMapper;
 
     // ================= LOCACION GEOGRAFICA =================
 
@@ -55,12 +55,10 @@ public class LocacionFeriadoService {
         }
     }
 
-    // Método único para filtrar locaciones por nivel
     public List<LocacionGeografica> listarLocacionesPorNivel(String nivel, String codigoProvincia, String codigoCanton) {
         log.info("Listando locaciones para nivel: {}, provincia: {}, cantón: {}", nivel, codigoProvincia, codigoCanton);
         
         List<LocacionGeografica> locaciones;
-        
         switch (nivel != null ? nivel.toLowerCase() : "provincia") {
             case "provincia":
                 locaciones = locacionGeograficaRepositorio.findByEstadoAndCodigoCantonIsNullAndCodigoParroquiaIsNull("ACTIVO");
@@ -93,15 +91,13 @@ public class LocacionFeriadoService {
     // ================= FERIADO =================
 
     private String generarCodigoFeriado(String nombre, int anio) {
-        // Tomar las primeras 3 letras del nombre y agregar el año
         String prefijo = nombre.length() >= 3 ? nombre.substring(0, 3).toUpperCase() : nombre.toUpperCase();
         return prefijo + anio;
     }
 
     public Feriado crearFeriado(Feriado feriado, String codigoLocacion) {
         log.info("Iniciando creación de feriado '{}', tipo {}", feriado.getNombre(), feriado.getTipo());
-        
-        // Generar código de feriado automáticamente
+
         String codigoFeriado = generarCodigoFeriado(feriado.getNombre(), feriado.getFecha().getYear());
         feriado.setCodigoFeriado(codigoFeriado);
         log.info("Código de feriado generado: {}", codigoFeriado);
@@ -114,7 +110,7 @@ public class LocacionFeriadoService {
             LocacionGeografica locacion = locacionGeograficaRepositorio.findByCodigoLocacion(codigoLocacion)
                 .orElseThrow(() -> new EntidadNoEncontradaException("No se encontró la locación con código: " + codigoLocacion, null, "LocacionGeografica"));
             
-            LocacionGeograficaDTO locacionEmbebida = locacionMapper.toEmbeddedDTO(locacion);
+            LocacionGeograficaDTO locacionEmbebida = locacionGeograficaMapper.toEmbeddedDTO(locacion);
             feriado.setLocacion(locacionEmbebida);
         } else {
             log.debug("Feriado NACIONAL, no se asigna locación específica.");
@@ -143,7 +139,6 @@ public class LocacionFeriadoService {
         log.info("Estado del feriado con código {} cambiado a {}.", codigoFeriado, nuevoEstado);
     }
 
-    // Listar feriados por tipo y año
     public List<Feriado> listarFeriadosPorTipoYAnio(String tipo, int anio) {
         log.info("Listando feriados {} para el año: {}", tipo, anio);
         LocalDate fechaInicio = LocalDate.of(anio, 1, 1);
@@ -154,7 +149,6 @@ public class LocacionFeriadoService {
         return feriados;
     }
 
-    // Listar feriados por año
     public List<Feriado> listarFeriadosPorAnio(int anio) {
         log.info("Listando todos los feriados para el año: {}", anio);
         LocalDate fechaInicio = LocalDate.of(anio, 1, 1);

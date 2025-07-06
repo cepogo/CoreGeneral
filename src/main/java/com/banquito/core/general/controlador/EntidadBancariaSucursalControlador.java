@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 public class EntidadBancariaSucursalControlador {
 
     private final EntidadBancariaSucursalServicio servicio;
-    private final EntidadBancariaMapper entidadMapper;
+    private final EntidadBancariaMapper entidadBancariaMapper;
     private final SucursalMapper sucursalMapper;
 
-    public EntidadBancariaSucursalControlador(EntidadBancariaSucursalServicio servicio, EntidadBancariaMapper entidadMapper, SucursalMapper sucursalMapper) {
+    public EntidadBancariaSucursalControlador(EntidadBancariaSucursalServicio servicio, EntidadBancariaMapper entidadBancariaMapper, SucursalMapper sucursalMapper) {
         this.servicio = servicio;
-        this.entidadMapper = entidadMapper;
+        this.entidadBancariaMapper = entidadBancariaMapper;
         this.sucursalMapper = sucursalMapper;
     }
 
@@ -38,7 +38,7 @@ public class EntidadBancariaSucursalControlador {
             @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
     })
     public ResponseEntity<EntidadBancariaDTO> crearEntidad(@Valid @RequestBody EntidadBancariaCreacionDTO dto) {
-        return ResponseEntity.ok(entidadMapper.toDTO(servicio.crearEntidad(dto)));
+        return ResponseEntity.ok(entidadBancariaMapper.toDTO(servicio.crearEntidad(dto)));
     }
 
     @GetMapping("/activa/primera")
