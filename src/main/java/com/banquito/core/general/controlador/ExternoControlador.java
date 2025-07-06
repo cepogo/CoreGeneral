@@ -69,4 +69,38 @@ public class ExternoControlador {
         Pais pais = paisRepositorio.findByCodigoPais(codigoPais);
         return ResponseEntity.ok(pais != null && "ACTIVO".equals(pais.getEstado()));
     }
+
+    @GetMapping("/locacion/validar")
+    public ResponseEntity<Boolean> validarLocacion(
+        @RequestParam String codigoProvincia,
+        @RequestParam(required = false) String codigoCanton,
+        @RequestParam(required = false) String codigoParroquia
+    ) {
+        boolean existe;
+        if (codigoParroquia != null && !codigoParroquia.isEmpty()) {
+            // Validar parroquia
+            existe = locacionGeograficaRepositorio
+                .findByCodigoProvinciaAndCodigoCantonAndCodigoParroquiaAndEstado(
+                    codigoProvincia, codigoCanton, codigoParroquia, "ACTIVO")
+                .stream()
+                .findAny()
+                .isPresent();
+        } else if (codigoCanton != null && !codigoCanton.isEmpty()) {
+            // Validar cantón
+            existe = locacionGeograficaRepositorio
+                .findByCodigoProvinciaAndCodigoCantonAndEstado(
+                    codigoProvincia, codigoCanton, "ACTIVO")
+                .stream()
+                .findAny()
+                .isPresent();
+        } else {
+            // Validar provincia
+            existe = locacionGeograficaRepositorio
+                .findByCodigoProvinciaAndEstado(codigoProvincia, "ACTIVO")
+                .stream()
+                .findAny()
+                .isPresent();
+        }
+        return ResponseEntity.ok(existe);
+    }
 } 

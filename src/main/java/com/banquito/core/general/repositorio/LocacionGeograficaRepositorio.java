@@ -33,4 +33,10 @@ public interface LocacionGeograficaRepositorio extends MongoRepository<LocacionG
         "{'$sort': {'codigoParroquia': 1}}"
     })
     List<LocacionGeografica> findByEstadoAndCodigoProvinciaAndCodigoCanton(String estado, String codigoProvincia, String codigoCanton);
+
+    List<LocacionGeografica> findByEstadoAndCodigoProvincia(String estado, String codigoProvincia);
+
+    List<LocacionGeografica> findByCodigoProvinciaAndEstado(String codigoProvincia, String estado);
+    List<LocacionGeografica> findByCodigoProvinciaAndCodigoCantonAndEstado(String codigoProvincia, String codigoCanton, String estado);
+    List<LocacionGeografica> findByCodigoProvinciaAndCodigoCantonAndCodigoParroquiaAndEstado(String codigoProvincia, String codigoCanton, String codigoParroquia, String estado);
 } 

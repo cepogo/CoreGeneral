@@ -15,6 +15,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,37 +61,45 @@ public class LocacionFeriadoService {
         }
     }
 
+    // Método utilitario para filtrar por claves únicas
+    public static <T> Predicate<T> distinctByKeys(Function<? super T, ?>... keyExtractors) {
+        Set<List<?>> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(Arrays.stream(keyExtractors)
+                .map(ke -> ke.apply(t))
+                .collect(Collectors.toList()));
+    }
+
     public List<LocacionGeografica> listarLocacionesPorNivel(String nivel, String codigoProvincia, String codigoCanton) {
         log.info("Listando locaciones para nivel: {}, provincia: {}, cantón: {}", nivel, codigoProvincia, codigoCanton);
-        
         List<LocacionGeografica> locaciones;
         switch (nivel != null ? nivel.toLowerCase() : "provincia") {
             case "provincia":
-                locaciones = locacionGeograficaRepositorio.findByEstadoAndCodigoCantonIsNullAndCodigoParroquiaIsNull("ACTIVO");
-                log.info("Se encontraron {} provincias", locaciones.size());
-                break;
-                
+                locaciones = locacionGeograficaRepositorio.findByEstado("ACTIVO");
+                // Filtrar provincias únicas por codigoProvincia y provincia
+                return locaciones.stream()
+                        .filter(distinctByKeys(LocacionGeografica::getCodigoProvincia, LocacionGeografica::getProvincia))
+                        .collect(Collectors.toList());
             case "canton":
                 if (codigoProvincia == null || codigoProvincia.isEmpty()) {
                     throw new IllegalArgumentException("Para listar cantones debe especificar el código de provincia");
                 }
-                locaciones = locacionGeograficaRepositorio.findByEstadoAndCodigoProvinciaAndCodigoParroquiaIsNull("ACTIVO", codigoProvincia);
-                log.info("Se encontraron {} cantones para la provincia {}", locaciones.size(), codigoProvincia);
-                break;
-                
+                locaciones = locacionGeograficaRepositorio.findByEstadoAndCodigoProvincia("ACTIVO", codigoProvincia);
+                // Filtrar cantones únicos por codigoCanton y canton
+                return locaciones.stream()
+                        .filter(distinctByKeys(LocacionGeografica::getCodigoCanton, LocacionGeografica::getCanton))
+                        .collect(Collectors.toList());
             case "parroquia":
                 if (codigoProvincia == null || codigoProvincia.isEmpty() || codigoCanton == null || codigoCanton.isEmpty()) {
                     throw new IllegalArgumentException("Para listar parroquias debe especificar el código de provincia y cantón");
                 }
                 locaciones = locacionGeograficaRepositorio.findByEstadoAndCodigoProvinciaAndCodigoCanton("ACTIVO", codigoProvincia, codigoCanton);
-                log.info("Se encontraron {} parroquias para el cantón {} de la provincia {}", locaciones.size(), codigoCanton, codigoProvincia);
-                break;
-                
+                // Filtrar parroquias únicas por codigoParroquia y parroquia
+                return locaciones.stream()
+                        .filter(distinctByKeys(LocacionGeografica::getCodigoParroquia, LocacionGeografica::getParroquia))
+                        .collect(Collectors.toList());
             default:
                 throw new IllegalArgumentException("Nivel no válido. Use: provincia, canton, o parroquia");
         }
-        
-        return locaciones;
     }
 
     // ================= FERIADO =================
