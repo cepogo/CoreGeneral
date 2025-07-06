@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FeriadosRepositorio extends MongoRepository<Feriado, String> {
@@ -14,4 +15,5 @@ public interface FeriadosRepositorio extends MongoRepository<Feriado, String> {
 
     List<Feriado> findByEstadoAndTipoAndFechaBetween(String estado, String tipo, LocalDate fechaInicio, LocalDate fechaFin);
     
+    Optional<Feriado> findByCodigoFeriado(String codigoFeriado);
 } 

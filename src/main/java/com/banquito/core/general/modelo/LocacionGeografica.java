@@ -1,24 +1,23 @@
 package com.banquito.core.general.modelo;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
+@Data
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
-@Document(collection = "locaciones_geograficas")
+@AllArgsConstructor
+@Document(collection = "locacion_geografica")
 @CompoundIndex(name = "idxLocacionGeografica_provinciacanton", def = "{'codigoProvincia': 1, 'codigoCanton': 1}")
 public class LocacionGeografica {
 

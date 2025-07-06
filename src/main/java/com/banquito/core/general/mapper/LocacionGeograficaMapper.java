@@ -1,28 +1,35 @@
 package com.banquito.core.general.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
-
+import com.banquito.core.general.dto.*;
 import com.banquito.core.general.modelo.LocacionGeografica;
-import com.banquito.core.general.dto.LocacionGeograficaDTO;
-import com.banquito.core.general.dto.LocacionGeograficaCreacionDTO;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.ValueMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface LocacionGeograficaMapper {
-    LocacionGeograficaMapper INSTANCE = Mappers.getMapper(LocacionGeograficaMapper.class);
-
-    @ValueMapping(source = "MANTENIMIENTO", target = "INACTIVO")
-    LocacionGeograficaDTO toDTO(LocacionGeografica locacionGeografica);
-
-    LocacionGeografica toPersistence(LocacionGeograficaDTO dto);
+    
+    @Mapping(target = "codigoProvincia", source = "provincia")
+    @Mapping(target = "codigoCanton", source = "canton")
+    @Mapping(target = "codigoParroquia", source = "parroquia")
+    LocacionGeograficaDTO toDTO(LocacionGeografica locacion);
+    
+    @Mapping(target = "codigoProvincia", source = "provincia")
+    @Mapping(target = "codigoCanton", source = "canton")
+    @Mapping(target = "codigoParroquia", source = "parroquia")
+    LocacionGeograficaDTO toEmbeddedDTO(LocacionGeografica locacion);
+    
+    @Mapping(target = "provincia", source = "codigoProvincia")
+    @Mapping(target = "canton", source = "codigoCanton")
+    @Mapping(target = "parroquia", source = "codigoParroquia")
+    LocacionGeografica toEntity(LocacionGeograficaDTO dto);
 
     LocacionGeografica toEntity(LocacionGeograficaCreacionDTO dto);
-
-    void updateFromEntity(LocacionGeografica source, @MappingTarget LocacionGeografica target);
     
-    // Método para convertir a DTO embebido del modelo
-    LocacionGeograficaDTO toEmbeddedDTO(LocacionGeografica locacion);
+    // Métodos para DTOs específicos por nivel
+    ProvinciaDTO toProvinciaDTO(LocacionGeografica locacion);
+    
+    CantonDTO toCantonDTO(LocacionGeografica locacion);
+    
+    ParroquiaDTO toParroquiaDTO(LocacionGeografica locacion);
 } 

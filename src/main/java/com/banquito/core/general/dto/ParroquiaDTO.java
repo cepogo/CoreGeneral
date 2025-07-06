@@ -7,8 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LocacionGeograficaDTO {
-
+public class ParroquiaDTO {
     @NotNull(message = "El código de locación no puede ser nulo")
     @Size(min = 1, max = 10, message = "El código de locación debe tener entre 1 y 10 caracteres")
     private String codigoLocacion;
@@ -25,15 +24,19 @@ public class LocacionGeograficaDTO {
     @Size(min = 1, max = 100, message = "El nombre de la provincia debe tener entre 1 y 100 caracteres")
     private String provincia;
 
-    @Size(max = 4, message = "El código de cantón no debe exceder los 4 caracteres")
+    @NotNull(message = "El código de cantón no puede ser nulo")
+    @Size(min = 1, max = 4, message = "El código de cantón debe tener entre 1 y 4 caracteres")
     private String codigoCanton;
 
-    @Size(max = 100, message = "El nombre del cantón no debe exceder los 100 caracteres")
+    @NotNull(message = "El nombre del cantón no puede ser nulo")
+    @Size(min = 1, max = 100, message = "El nombre del cantón debe tener entre 1 y 100 caracteres")
     private String canton;
 
-    @Size(max = 4, message = "El código de parroquia no debe exceder los 4 caracteres")
+    @NotNull(message = "El código de parroquia no puede ser nulo")
+    @Size(min = 1, max = 4, message = "El código de parroquia debe tener entre 1 y 4 caracteres")
     private String codigoParroquia;
 
-    @Size(max = 100, message = "El nombre de la parroquia no debe exceder los 100 caracteres")
+    @NotNull(message = "El nombre de la parroquia no puede ser nulo")
+    @Size(min = 1, max = 100, message = "El nombre de la parroquia debe tener entre 1 y 100 caracteres")
     private String parroquia;
 } 

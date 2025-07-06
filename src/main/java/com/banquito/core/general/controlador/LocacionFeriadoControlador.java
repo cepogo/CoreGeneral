@@ -1,9 +1,6 @@
 package com.banquito.core.general.controlador;
 
-import com.banquito.core.general.dto.LocacionGeograficaDTO;
-import com.banquito.core.general.dto.FeriadoDTO;
-import com.banquito.core.general.dto.FeriadoCreacionDTO;
-import com.banquito.core.general.dto.LocacionGeograficaCreacionDTO;
+import com.banquito.core.general.dto.*;
 import com.banquito.core.general.mapper.LocacionGeograficaMapper;
 import com.banquito.core.general.mapper.FeriadoMapper;
 import com.banquito.core.general.modelo.LocacionGeografica;
@@ -37,29 +34,47 @@ public class LocacionFeriadoControlador {
         return ResponseEntity.ok(locacionMapper.toDTO(creada));
     }
 
-    @GetMapping("/locaciones/codigo/{codigoLocacion}")
-    @Operation(summary = "Obtener locación geográfica por código")
-    public ResponseEntity<LocacionGeograficaDTO> obtenerLocacionPorCodigo(@PathVariable String codigoLocacion) {
-        LocacionGeografica locacion = service.obtenerLocacionPorCodigo(codigoLocacion);
-        return ResponseEntity.ok(locacionMapper.toDTO(locacion));
+    @GetMapping("/locaciones")
+    @Operation(summary = "Listar locaciones por nivel geográfico", 
+               description = "Filtrar por nivel: provincia, canton, parroquia. Para canton requiere codigoProvincia. Para parroquia requiere codigoProvincia y codigoCanton.")
+    public ResponseEntity<?> listarLocaciones(
+            @RequestParam(required = false, defaultValue = "provincia") String nivel,
+            @RequestParam(required = false) String codigoProvincia,
+            @RequestParam(required = false) String codigoCanton) {
+        
+        List<LocacionGeografica> locaciones = service.listarLocacionesPorNivel(nivel, codigoProvincia, codigoCanton);
+        
+        switch (nivel.toLowerCase()) {
+            case "provincia":
+                List<ProvinciaDTO> provincias = locaciones.stream()
+                        .map(locacionMapper::toProvinciaDTO)
+                        .toList();
+                return ResponseEntity.ok(provincias);
+                
+            case "canton":
+                List<CantonDTO> cantones = locaciones.stream()
+                        .map(locacionMapper::toCantonDTO)
+                        .toList();
+                return ResponseEntity.ok(cantones);
+                
+            case "parroquia":
+                List<ParroquiaDTO> parroquias = locaciones.stream()
+                        .map(locacionMapper::toParroquiaDTO)
+                        .toList();
+                return ResponseEntity.ok(parroquias);
+                
+            default:
+                List<LocacionGeograficaDTO> dtos = locaciones.stream()
+                        .map(locacionMapper::toDTO)
+                        .toList();
+                return ResponseEntity.ok(dtos);
+        }
     }
 
-
-
-    @GetMapping("/locaciones/activas")
-    @Operation(summary = "Listar locaciones geográficas activas")
-    public ResponseEntity<List<LocacionGeograficaDTO>> listarLocacionesActivas() {
-        List<LocacionGeograficaDTO> dtos = service.listarLocacionesActivas()
-                .stream()
-                .map(locacionMapper::toDTO)
-                .toList(); // Usar toList() en lugar de collect(Collectors.toList()) - más eficiente
-        return ResponseEntity.ok(dtos);
-    }
-
-    @PatchMapping("/locaciones/{id}/estado")
-    @Operation(summary = "Cambiar estado de locación geográfica")
-    public ResponseEntity<Void> cambiarEstadoLocacion(@PathVariable String id, @RequestParam String nuevoEstado) {
-        service.cambiarEstadoLocacionGeografica(id, nuevoEstado);
+    @PatchMapping("/locaciones/codigo/{codigoLocacion}/estado")
+    @Operation(summary = "Cambiar estado de locación geográfica por código")
+    public ResponseEntity<Void> cambiarEstadoLocacion(@PathVariable String codigoLocacion, @RequestParam String nuevoEstado) {
+        service.cambiarEstadoLocacionGeografica(codigoLocacion, nuevoEstado);
         return ResponseEntity.ok().build();
     }
 
@@ -73,35 +88,30 @@ public class LocacionFeriadoControlador {
         return ResponseEntity.ok(feriadoMapper.toDTO(creado));
     }
 
-
-    @PatchMapping("/feriados/{id}/estado")
-    @Operation(summary = "Cambiar estado de feriado")
-    public ResponseEntity<Void> cambiarEstadoFeriado(@PathVariable String id, @RequestParam String nuevoEstado) {
-        Feriado feriado = service.obtenerFeriadoPorId(id);
-        feriado.setEstado(nuevoEstado);
-        service.cambiarEstadoFeriado(feriado);
+    @PatchMapping("/feriados/codigo/{codigoFeriado}/estado")
+    @Operation(summary = "Cambiar estado de feriado por código")
+    public ResponseEntity<Void> cambiarEstadoFeriadoPorCodigo(@PathVariable String codigoFeriado, @RequestParam String nuevoEstado) {
+        service.cambiarEstadoFeriadoPorCodigo(codigoFeriado, nuevoEstado);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/feriados")
-    @Operation(summary = "Listar feriados activos de un año")
-    public ResponseEntity<List<FeriadoDTO>> listarFeriadosPorAnio(@RequestParam int anio) {
-        List<FeriadoDTO> dtos = service.obtenerFeriadosPorAnio(anio)
+    @GetMapping("/feriados/tipo/{tipo}/anio/{anio}")
+    @Operation(summary = "Listar feriados por tipo y año")
+    public ResponseEntity<List<FeriadoDTO>> listarFeriadosPorTipoYAnio(@PathVariable String tipo, @PathVariable int anio) {
+        List<FeriadoDTO> dtos = service.listarFeriadosPorTipoYAnio(tipo, anio)
                 .stream()
                 .map(feriadoMapper::toDTO)
                 .toList();
         return ResponseEntity.ok(dtos);
     }
 
-    @GetMapping("/feriados/nacionales")
-    @Operation(summary = "Listar feriados nacionales de un año")
-    public ResponseEntity<List<FeriadoDTO>> listarFeriadosNacionalesPorAnio(@RequestParam int anio) {
-        List<FeriadoDTO> dtos = service.obtenerFeriadosNacionalesPorAnio(anio)
+    @GetMapping("/feriados/anio/{anio}")
+    @Operation(summary = "Listar feriados por año")
+    public ResponseEntity<List<FeriadoDTO>> listarFeriadosPorAnio(@PathVariable int anio) {
+        List<FeriadoDTO> dtos = service.listarFeriadosPorAnio(anio)
                 .stream()
                 .map(feriadoMapper::toDTO)
-                .toList(); 
+                .toList();
         return ResponseEntity.ok(dtos);
     }
-
-
 } 

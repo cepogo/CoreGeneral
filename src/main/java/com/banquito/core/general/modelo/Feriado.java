@@ -5,29 +5,30 @@ import java.time.LocalDate;
 import com.banquito.core.general.dto.LocacionGeograficaDTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
 
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
+@Data
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@AllArgsConstructor
 @Document(collection = "feriados")
 public class Feriado {
 
     @Id
     private String id;
-    private LocalDate fecha;
+    
+    @Indexed(unique = true)
+    private String codigoFeriado;
+    
     private String nombre;
+    private String descripcion;
+    private LocalDate fecha;
     private String tipo;
-    private String estado;
     private LocacionGeograficaDTO locacion;
+    private String estado;
     private Long version;
 
 } 

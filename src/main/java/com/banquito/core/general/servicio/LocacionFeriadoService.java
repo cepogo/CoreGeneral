@@ -1,9 +1,6 @@
 package com.banquito.core.general.servicio;
 
 import com.banquito.core.general.dto.LocacionGeograficaDTO;
-import com.banquito.core.general.enums.EstadoGeneralEnum;
-import com.banquito.core.general.enums.EstadoLocacionesGeograficasEnum;
-import com.banquito.core.general.enums.TipoFeriadosEnum;
 import com.banquito.core.general.excepcion.ActualizarEntidadException;
 import com.banquito.core.general.excepcion.CrearEntidadException;
 import com.banquito.core.general.excepcion.EntidadNoEncontradaException;
@@ -32,7 +29,7 @@ public class LocacionFeriadoService {
     public LocacionGeografica crearLocacionGeografica(LocacionGeografica locacion) {
         try {
             log.info("Creando nueva locación geográfica: {}", locacion.getProvincia());
-            locacion.setEstado(EstadoLocacionesGeograficasEnum.ACTIVO);
+            locacion.setEstado("ACTIVO");
             locacion.setVersion(1L);
             LocacionGeografica locacionGuardada = locacionGeograficaRepositorio.save(locacion);
             log.info("Locación geográfica creada exitosamente con ID: {}", locacionGuardada.getId());
@@ -43,47 +40,73 @@ public class LocacionFeriadoService {
         }
     }
 
-    public LocacionGeografica obtenerLocacionPorCodigo(String codigoLocacion) {
-            log.info("Buscando locación geográfica con código: {}", codigoLocacion);
-            return locacionGeograficaRepositorio.findByCodigoLocacion(codigoLocacion)
-                    .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada con código: " + codigoLocacion, null, "LocacionGeografica"));
-        }
-
-
-    public List<LocacionGeografica> listarLocacionesActivas() {
-        log.info("Listando todas las locaciones geográficas activas");
-        List<LocacionGeografica> locaciones = locacionGeograficaRepositorio.findByEstado(EstadoLocacionesGeograficasEnum.ACTIVO);
-        log.info("Se encontraron {} locaciones activas", locaciones.size());
-        return locaciones;
-    }
-
-    public void cambiarEstadoLocacionGeografica(String idLocacion, String nuevoEstado) {
-        log.info("Cambiando estado de locación geográfica con ID: {} a {}", idLocacion, nuevoEstado);
-        LocacionGeografica entity = locacionGeograficaRepositorio.findById(idLocacion)
-                .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada", 2, "LocacionGeografica"));
+    public void cambiarEstadoLocacionGeografica(String codigoLocacion, String nuevoEstado) {
+        log.info("Cambiando estado de locación geográfica con código: {} a {}", codigoLocacion, nuevoEstado);
+        LocacionGeografica entity = locacionGeograficaRepositorio.findByCodigoLocacion(codigoLocacion)
+                .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada con código: " + codigoLocacion, null, "LocacionGeografica"));
         try {
             entity.setEstado(nuevoEstado);
             entity.setVersion(entity.getVersion() == null ? 1L : entity.getVersion() + 1L);
             locacionGeograficaRepositorio.save(entity);
-            log.info("Estado de locación geográfica con ID {} cambiado a {}.", idLocacion, nuevoEstado);
+            log.info("Estado de locación geográfica con código {} cambiado a {}.", codigoLocacion, nuevoEstado);
         } catch (Exception e) {
-            log.error("Error al cambiar estado de locación geográfica {}: {}", idLocacion, e.getMessage(), e);
+            log.error("Error al cambiar estado de locación geográfica {}: {}", codigoLocacion, e.getMessage(), e);
             throw new ActualizarEntidadException("LocacionGeografica", "Error al cambiar el estado de la locación geográfica: " + e.getMessage());
         }
     }
 
-    public LocacionGeografica obtenerLocacionPorId(String idLocacion) {
-        log.info("Buscando locación geográfica con ID: {}", idLocacion);
-        return locacionGeograficaRepositorio.findById(idLocacion)
-                .orElseThrow(() -> new EntidadNoEncontradaException("Locación geográfica no encontrada", 2, "LocacionGeografica"));
+    // Método único para filtrar locaciones por nivel
+    public List<LocacionGeografica> listarLocacionesPorNivel(String nivel, String codigoProvincia, String codigoCanton) {
+        log.info("Listando locaciones para nivel: {}, provincia: {}, cantón: {}", nivel, codigoProvincia, codigoCanton);
+        
+        List<LocacionGeografica> locaciones;
+        
+        switch (nivel != null ? nivel.toLowerCase() : "provincia") {
+            case "provincia":
+                locaciones = locacionGeograficaRepositorio.findByEstadoAndCodigoCantonIsNullAndCodigoParroquiaIsNull("ACTIVO");
+                log.info("Se encontraron {} provincias", locaciones.size());
+                break;
+                
+            case "canton":
+                if (codigoProvincia == null || codigoProvincia.isEmpty()) {
+                    throw new IllegalArgumentException("Para listar cantones debe especificar el código de provincia");
+                }
+                locaciones = locacionGeograficaRepositorio.findByEstadoAndCodigoProvinciaAndCodigoParroquiaIsNull("ACTIVO", codigoProvincia);
+                log.info("Se encontraron {} cantones para la provincia {}", locaciones.size(), codigoProvincia);
+                break;
+                
+            case "parroquia":
+                if (codigoProvincia == null || codigoProvincia.isEmpty() || codigoCanton == null || codigoCanton.isEmpty()) {
+                    throw new IllegalArgumentException("Para listar parroquias debe especificar el código de provincia y cantón");
+                }
+                locaciones = locacionGeograficaRepositorio.findByEstadoAndCodigoProvinciaAndCodigoCanton("ACTIVO", codigoProvincia, codigoCanton);
+                log.info("Se encontraron {} parroquias para el cantón {} de la provincia {}", locaciones.size(), codigoCanton, codigoProvincia);
+                break;
+                
+            default:
+                throw new IllegalArgumentException("Nivel no válido. Use: provincia, canton, o parroquia");
+        }
+        
+        return locaciones;
     }
 
     // ================= FERIADO =================
 
+    private String generarCodigoFeriado(String nombre, int anio) {
+        // Tomar las primeras 3 letras del nombre y agregar el año
+        String prefijo = nombre.length() >= 3 ? nombre.substring(0, 3).toUpperCase() : nombre.toUpperCase();
+        return prefijo + anio;
+    }
+
     public Feriado crearFeriado(Feriado feriado, String locacionId) {
         log.info("Iniciando creación de feriado '{}', tipo {}", feriado.getNombre(), feriado.getTipo());
         
-        if (TipoFeriadosEnum.LOCAL.equals(feriado.getTipo())) {
+        // Generar código de feriado automáticamente
+        String codigoFeriado = generarCodigoFeriado(feriado.getNombre(), feriado.getFecha().getYear());
+        feriado.setCodigoFeriado(codigoFeriado);
+        log.info("Código de feriado generado: {}", codigoFeriado);
+        
+        if ("LOCAL".equals(feriado.getTipo())) {
             if (locacionId == null || locacionId.isEmpty()) {
                 throw new CrearEntidadException("Feriado", "Para feriados locales debe especificar una locación.");
             }
@@ -98,49 +121,47 @@ public class LocacionFeriadoService {
             feriado.setLocacion(null);
         }
         
-        feriado.setEstado(EstadoGeneralEnum.ACTIVO);
+        feriado.setEstado("ACTIVO");
         feriado.setVersion(1L);
         Feriado feriadoGuardado = feriadosRepositorio.save(feriado);
-        log.info("Feriado '{}' creado exitosamente con ID: {}", feriadoGuardado.getNombre(), feriadoGuardado.getId());
+        log.info("Feriado '{}' creado exitosamente con código: {}", feriadoGuardado.getNombre(), feriadoGuardado.getCodigoFeriado());
         return feriadoGuardado;
     }
 
-    public Feriado modificarFeriado(Feriado feriado) {
-        log.info("Iniciando modificación del feriado con ID: {}", feriado.getId());
+    public Feriado obtenerFeriadoPorCodigo(String codigoFeriado) {
+        log.info("Buscando feriado con código: {}", codigoFeriado);
+        return feriadosRepositorio.findByCodigoFeriado(codigoFeriado)
+            .orElseThrow(() -> new EntidadNoEncontradaException("Feriado no encontrado con código: " + codigoFeriado, null, "Feriado"));
+    }
+
+    public void cambiarEstadoFeriadoPorCodigo(String codigoFeriado, String nuevoEstado) {
+        log.info("Cambiando estado del feriado con código: {} a {}", codigoFeriado, nuevoEstado);
+        Feriado feriado = obtenerFeriadoPorCodigo(codigoFeriado);
+        feriado.setEstado(nuevoEstado);
         feriado.setVersion(feriado.getVersion() + 1L);
-        Feriado feriadoActualizado = feriadosRepositorio.save(feriado);
-        log.info("Feriado con ID {} modificado exitosamente.", feriado.getId());
-        return feriadoActualizado;
+        feriadosRepositorio.save(feriado);
+        log.info("Estado del feriado con código {} cambiado a {}.", codigoFeriado, nuevoEstado);
     }
 
-    public Feriado cambiarEstadoFeriado(Feriado feriado) {
-        log.info("Cambiando estado del feriado con ID: {} a {}", feriado.getId(), feriado.getEstado());
-        return this.modificarFeriado(feriado);
+    // Listar feriados por tipo y año
+    public List<Feriado> listarFeriadosPorTipoYAnio(String tipo, int anio) {
+        log.info("Listando feriados {} para el año: {}", tipo, anio);
+        LocalDate fechaInicio = LocalDate.of(anio, 1, 1);
+        LocalDate fechaFin = LocalDate.of(anio, 12, 31);
+        List<Feriado> feriados = feriadosRepositorio.findByEstadoAndTipoAndFechaBetween(
+            "ACTIVO", tipo, fechaInicio, fechaFin);
+        log.info("Se encontraron {} feriados {} para el año {}", feriados.size(), tipo, anio);
+        return feriados;
     }
 
-    public List<Feriado> obtenerFeriadosPorAnio(int anio) {
+    // Listar feriados por año
+    public List<Feriado> listarFeriadosPorAnio(int anio) {
         log.info("Listando todos los feriados para el año: {}", anio);
         LocalDate fechaInicio = LocalDate.of(anio, 1, 1);
         LocalDate fechaFin = LocalDate.of(anio, 12, 31);
         List<Feriado> feriados = feriadosRepositorio.findByEstadoAndFechaBetween(
-                EstadoGeneralEnum.ACTIVO, fechaInicio, fechaFin);
-        log.info("Se encontraron {} feriados activos para el año {}", feriados.size(), anio);
+            "ACTIVO", fechaInicio, fechaFin);
+        log.info("Se encontraron {} feriados para el año {}", feriados.size(), anio);
         return feriados;
-    }
-
-    public List<Feriado> obtenerFeriadosNacionalesPorAnio(int anio) {
-        log.info("Listando feriados NACIONALES para el año: {}", anio);
-        LocalDate fechaInicio = LocalDate.of(anio, 1, 1);
-        LocalDate fechaFin = LocalDate.of(anio, 12, 31);
-        List<Feriado> feriados = feriadosRepositorio.findByEstadoAndTipoAndFechaBetween(
-                EstadoGeneralEnum.ACTIVO, TipoFeriadosEnum.NACIONAL, fechaInicio, fechaFin);
-        log.info("Se encontraron {} feriados nacionales para el año {}", feriados.size(), anio);
-        return feriados;
-    }
-
-    public Feriado obtenerFeriadoPorId(String id) {
-        log.debug("Buscando feriado con id: {}", id);
-        return feriadosRepositorio.findById(id)
-            .orElseThrow(() -> new EntidadNoEncontradaException("Feriado no encontrado con ID: " + id, null, "Feriado"));
     }
 } 
