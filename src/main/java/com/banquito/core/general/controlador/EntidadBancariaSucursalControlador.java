@@ -1,23 +1,38 @@
 package com.banquito.core.general.controlador;
 
-import com.banquito.core.general.dto.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.banquito.core.general.dto.EntidadBancariaCreacionDTO;
+import com.banquito.core.general.dto.EntidadBancariaDTO;
+import com.banquito.core.general.dto.EntidadBancariaMonedaCreacionDTO;
+import com.banquito.core.general.dto.SucursalCreacionDTO;
+import com.banquito.core.general.dto.SucursalDTO;
+import com.banquito.core.general.dto.SucursalUpdateDTO;
 import com.banquito.core.general.mapper.EntidadBancariaMapper;
 import com.banquito.core.general.mapper.SucursalMapper;
 import com.banquito.core.general.modelo.Sucursal;
 import com.banquito.core.general.servicio.EntidadBancariaSucursalServicio;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/banco")
+@RequestMapping("/api/general/v1/banco")
 @Tag(name = "Entidades y Sucursales", description = "Gestiona las Entidades Bancarias y sus Sucursales")
 public class EntidadBancariaSucursalControlador {
 

@@ -1,23 +1,29 @@
 package com.banquito.core.general.controlador;
 
-import com.banquito.core.general.modelo.Moneda;
-import com.banquito.core.general.modelo.EntidadBancaria;
-import com.banquito.core.general.modelo.LocacionGeografica;
-import com.banquito.core.general.modelo.Sucursal;
-import com.banquito.core.general.modelo.Pais;
-import com.banquito.core.general.repositorio.MonedaRepositorio;
-import com.banquito.core.general.repositorio.EntidadBancariaRepositorio;
-import com.banquito.core.general.repositorio.LocacionGeograficaRepositorio;
-import com.banquito.core.general.repositorio.SucursalRepositorio;
-import com.banquito.core.general.repositorio.PaisRepositorio;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.banquito.core.general.modelo.EntidadBancaria;
+import com.banquito.core.general.modelo.LocacionGeografica;
+import com.banquito.core.general.modelo.Moneda;
+import com.banquito.core.general.modelo.Pais;
+import com.banquito.core.general.modelo.Sucursal;
+import com.banquito.core.general.repositorio.EntidadBancariaRepositorio;
+import com.banquito.core.general.repositorio.LocacionGeograficaRepositorio;
+import com.banquito.core.general.repositorio.MonedaRepositorio;
+import com.banquito.core.general.repositorio.PaisRepositorio;
+import com.banquito.core.general.repositorio.SucursalRepositorio;
+
+import lombok.RequiredArgsConstructor;
+
 @RestController
-@RequestMapping("/api/externo")
+@RequestMapping("/api/general/v1/externo")
 @RequiredArgsConstructor
 public class ExternoControlador {
     

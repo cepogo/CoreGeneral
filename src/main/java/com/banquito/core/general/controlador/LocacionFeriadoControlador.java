@@ -1,22 +1,37 @@
 package com.banquito.core.general.controlador;
 
-import com.banquito.core.general.dto.*;
-import com.banquito.core.general.mapper.LocacionGeograficaMapper;
-import com.banquito.core.general.mapper.FeriadoMapper;
-import com.banquito.core.general.modelo.LocacionGeografica;
-import com.banquito.core.general.modelo.Feriado;
-import com.banquito.core.general.servicio.LocacionFeriadoService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.banquito.core.general.dto.CantonDTO;
+import com.banquito.core.general.dto.FeriadoCreacionDTO;
+import com.banquito.core.general.dto.FeriadoDTO;
+import com.banquito.core.general.dto.LocacionGeograficaCreacionDTO;
+import com.banquito.core.general.dto.LocacionGeograficaDTO;
+import com.banquito.core.general.dto.ParroquiaDTO;
+import com.banquito.core.general.dto.ProvinciaDTO;
+import com.banquito.core.general.mapper.FeriadoMapper;
+import com.banquito.core.general.mapper.LocacionGeograficaMapper;
+import com.banquito.core.general.modelo.Feriado;
+import com.banquito.core.general.modelo.LocacionGeografica;
+import com.banquito.core.general.servicio.LocacionFeriadoService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RestController
-@RequestMapping("/api/locaciones-feriados")
+@RequestMapping("/api/general/v1/locaciones-feriados")
 @RequiredArgsConstructor
 @Tag(name = "Locaciones y Feriados", description = "Operaciones para locaciones geográficas y feriados")
 public class LocacionFeriadoControlador {
